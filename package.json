@@ -1,12 +1,14 @@
 {
   "name": "crux-api",
   "version": "0.1.0",
-  "description": "...",
+  "description": "A tiny utility for Chrome UX Report API",
   "repository": "treosh/crux-api",
   "bugs": "https://github.com/treosh/crux-api/issues",
   "license": "MIT",
-  "sideEffects": false,
   "source": "src/index.js",
+  "module": "src/index.js",
+  "types": "dist/crux-api.d.ts",
+  "main": "dist/crux-api.js",
   "files": [
     "dist",
     "src"
@@ -23,10 +25,26 @@
     "size-limit": "^4.6.0",
     "typescript": "^4.0.3"
   },
-  "keywords": [],
+  "keywords": [
+    "CrUX",
+    "CrUX API",
+    "Chrome User Experience Report",
+    "Chrome UX Report",
+    "Core Web Vitals",
+    "Web Performance",
+    "records.queryRecord",
+    "FCP",
+    "First Contentful Paint",
+    "LCP",
+    "Largest Contentful Paint",
+    "FID",
+    "First Input Delay",
+    "CLS",
+    "Cumulative Layout Shift"
+  ],
   "size-limit": [
     {
-      "limit": "300B",
+      "limit": "400B",
       "path": "./src/index.js"
     }
   ]
