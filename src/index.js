@@ -1,28 +1,31 @@
 const queryRecord = 'https://chromeuxreport.googleapis.com/v1/records:queryRecord'
 
 /**
- * @typedef {'ALL_FORM_FACTORS' | 'PHONE' | 'DESKTOP' | 'TABLET'} CruxApiFormFactor
- * @typedef {'offline' | 'slow-2G' | '2G' | '3G' | '4G'} CruxApiConnection
- * @typedef {{ histogram: { start: number | string, end: number | string, density: number }[], percentiles: { p75: number | string } }} CruxApiMetric
+ * @typedef {{ url?: string, origin?: string, formFactor?: FormFactor, effectiveConnectionType?: Connection }} FetchParams
+ * @typedef {'ALL_FORM_FACTORS' | 'PHONE' | 'DESKTOP' | 'TABLET'} FormFactor
+ * @typedef {'offline' | 'slow-2G' | '2G' | '3G' | '4G'} Connection
+ * @typedef {{ histogram: { start: number | string, end: number | string, density: number }[], percentiles: { p75: number | string } }} MetricValue
+ * @typedef {'first_contentful_paint' | 'largest_contentful_paint' | 'first_input_delay' | 'cumulative_layout_shift'} MetricName
  * @typedef {{
  *    record: {
  *      key: {
  *        url: string,
- *        effectiveConnectionType?: CruxApiConnection,
- *        formFactor?:CruxApiFormFactor
+ *        effectiveConnectionType?: Connection,
+ *        formFactor?: FormFactor
  *      },
  *      metrics: {
- *        first_contentful_paint?: CruxApiMetric,
- *        largest_contentful_paint?: CruxApiMetric,
- *        first_input_delay?: CruxApiMetric,
- *        cumulative_layout_shift?: CruxApiMetric,
+ *        first_contentful_paint?: MetricValue,
+ *        largest_contentful_paint?: MetricValue,
+ *        first_input_delay?: MetricValue,
+ *        cumulative_layout_shift?: MetricValue,
  *      }
  *    },
  *    urlNormalizationDetails?: {
  *      originalUrl: string,
  *      normalizedUrl: string
  *    }
- * }} CruxApiResponse
+ * }} SuccessResponse
+ * @typedef {{ error: { code: number, message: string, status: string } }} ErrorResponse
  */
 
 /**
@@ -41,7 +44,7 @@ const queryRecord = 'https://chromeuxreport.googleapis.com/v1/records:queryRecor
  *   "status":"RESOURCE_EXHAUSTED",
  *   "details":[{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Google developer console API key","url":"https://console.developers.google.com/project/224801012400/apiui/credential"}]}]
  * }
- * @param {{ key: string, fetch?: any, maxRetries?: number, maxRetryTimeout?: number }} options
+ * @param {{ key: string, fetch?: function, maxRetries?: number, maxRetryTimeout?: number }} options
  */
 
 export function createCruxApi(options) {
@@ -52,30 +55,41 @@ export function createCruxApi(options) {
   return fetchCruxApi
 
   /**
-   * @param {{ url?: string, origin?: string, formFactor?: CruxApiFormFactor, effectiveConnectionType?: CruxApiConnection }} params
-   * @return {Promise<CruxApiResponse | null>}
+   * @param {FetchParams} params
+   * @return {Promise<SuccessResponse | null>}
    */
 
   async function fetchCruxApi(params, retryCounter = 1) {
     const apiEndpoint = `${queryRecord}?key=${key}`
     const res = await fetch(apiEndpoint, { method: 'POST', body: JSON.stringify(params) })
-    const json = await res.json()
+    if (res.status !== 200) throw new Error(`Invalid status: ${res.status}`)
 
-    if (json.error) {
-      if (json.error.code === 404) return null
-      if (json.error.code === 429) {
+    const json = await res.json()
+    if (json && json.error) {
+      const { error } = /** @type {ErrorResponse} */ (json)
+      if (error.code === 404) return null
+      if (error.code === 429) {
         if (retryCounter <= maxRetries) {
-          // random from 1 to maxRetryTimeout (https://stackoverflow.com/a/29246176)
-          const retryTimeout = Math.floor(Math.random() * maxRetryTimeout) + 1
-          await new Promise((resolve) => setTimeout(resolve, retryTimeout))
+          await new Promise((resolve) => setTimeout(resolve, random(maxRetryTimeout)))
           return fetchCruxApi(params, retryCounter + 1)
         } else {
-          throw new Error('Reached max retries')
+          throw new Error('Max retries reached')
         }
       }
-      throw new Error(JSON.stringify(json.error))
+      throw new Error(JSON.stringify(error))
     }
-    if (json && !json.record.key.url) throw new Error(`Invalid response: ${JSON.stringify(json)}`)
-    return json
+    if (!json || (json && !json.record.key.url)) throw new Error(`Invalid response: ${JSON.stringify(json)}`)
+    return /** @type {SuccessResponse} */ (json)
   }
+}
+
+/**
+ * Random from 1 to `max`.
+ * Based on: https://stackoverflow.com/a/29246176
+ *
+ * @param {number} max
+ */
+
+function random(max) {
+  return Math.floor(Math.random() * max) + 1
 }

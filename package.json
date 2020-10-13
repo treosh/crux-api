@@ -16,7 +16,8 @@
   "scripts": {
     "build": "microbundle build --no-sourcemap --format=cjs && yarn build:tsc",
     "build:tsc": "tsc --declaration --noEmit false --outDir dist/ --allowJs src/index.js && rm dist/index.js && mv dist/index.d.ts dist/crux-api.d.ts",
-    "test": "prettier -c src README.md && tsc -p . && size-limit"
+    "test": "prettier -c src README.md && tsc -p . && size-limit",
+    "prepack": "yarn build"
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "^4.6.0",
