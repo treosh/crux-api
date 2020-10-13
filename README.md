@@ -1,13 +1,14 @@
 # crux-api
 
-> A tiny utility for Chrome UX Report API
+> A tiny (400b) utility for Chrome UX Report API
 
 **Features**:
 
-- A tiny (350b) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord)
-- TypeScript support for CrUX API params
+- A tiny (400b) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord)
+- TypeScript support for CrUX API params and response
 - Handles `404 (CrUX data not found)` and returns `null`
 - Handles `429 (Quota exceeded)` with an automatic retry
+- URL/Origin normalization helpers
 
 ## Usage
 
@@ -20,9 +21,10 @@ npm install crux-api
 yarn add crux-api
 ```
 
+Fetch URL-level data:
+
 ```js
 import { createCruxApi } from 'crux-api'
-
 const fetchCruxApi = createCruxApi({ key: API_KEY })
 
 await fetchCruxApi({ url: 'https://www.github.com/' }) // fetch all dimensions
@@ -30,12 +32,25 @@ await fetchCruxApi({ url: 'https://www.github.com/', formFactor: 'DESKTOP' }) //
 await fetchCruxApi({ url: 'https://www.github.com/', formFactor: 'PHONE', effectiveConnectionType: '3G' }) // fetch data for phones on 3G
 ```
 
-## Todo
+Fetch Origin-level data:
 
-- [x] basic implementation (0.1.0)
-- [ ] tests (using node-fetch) + CI
-- [ ] add a helper for origin/url normalization
-- [ ] docs (response, use with node, options)
+```js
+import { createCruxApi } from 'crux-api'
+const fetchCruxApi = createCruxApi({ key: API_KEY })
+
+await fetchCruxApi({ origin: 'https://www.github.com' })
+await fetchCruxApi({ origin: 'https://www.github.com', formFactor: 'TABLET', effectiveConnectionType: '4G' })
+```
+
+Normalize URL/Origin to match CrUX API index:
+
+```js
+import { normalizeUrl, normalizeOrigin } from 'crux-api'
+
+console.log(normalizeUrl('https://github.com/search?q=crux-api')) // https://github.com/search (removes query params)
+console.log(normalizeUrl('https://github.com')) // https://github.com/ (adds ending "/")
+console.log(normalizeOrigin('https://github.com/')) // https://github.com (origin doesn't have an ending "/")
+```
 
 ## Credits
 

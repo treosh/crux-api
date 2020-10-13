@@ -2,7 +2,7 @@
   "name": "crux-api",
   "version": "0.1.0",
   "description": "A tiny utility for Chrome UX Report API",
-  "repository": "treosh/crux-api",
+  "repository": "https://github.com/treosh/crux-api",
   "bugs": "https://github.com/treosh/crux-api/issues",
   "license": "MIT",
   "source": "src/index.js",
