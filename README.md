@@ -8,7 +8,7 @@
 - TypeScript support for CrUX API params and response
 - Handles `404 (CrUX data not found)` and returns `null`
 - Handles `429 (Quota exceeded)` with an automatic retry
-- URL/Origin normalization helpers
+- URL normalization helper to match CrUX index key
 
 ## Usage
 
@@ -42,14 +42,13 @@ await fetchCruxApi({ origin: 'https://www.github.com' })
 await fetchCruxApi({ origin: 'https://www.github.com', formFactor: 'TABLET', effectiveConnectionType: '4G' })
 ```
 
-Normalize URL/Origin to match CrUX API index:
+Normalize URL to match CrUX API index:
 
 ```js
 import { normalizeUrl, normalizeOrigin } from 'crux-api'
 
 console.log(normalizeUrl('https://github.com/search?q=crux-api')) // https://github.com/search (removes query params)
 console.log(normalizeUrl('https://github.com')) // https://github.com/ (adds ending "/")
-console.log(normalizeOrigin('https://github.com/')) // https://github.com (origin doesn't have an ending "/")
 ```
 
 ## Credits

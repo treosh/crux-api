@@ -84,6 +84,17 @@ export function createCruxApi(options) {
 }
 
 /**
+ * Normalize URL to match CrUX API key.
+ *
+ * @param {string} url
+ */
+
+export function normalizeUrl(url) {
+  const u = new URL(url)
+  return u.origin + u.pathname
+}
+
+/**
  * Random from 1 to `max`.
  * Based on: https://stackoverflow.com/a/29246176
  *
