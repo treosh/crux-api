@@ -47,7 +47,7 @@ Normalize URL to match CrUX API index:
 ```js
 import { normalizeUrl, normalizeOrigin } from 'crux-api'
 
-console.log(normalizeUrl('https://github.com/marketplace?type=actions')) // https://github.com/marketplace (removes query params)
+console.log(normalizeUrl('https://github.com/marketplace?type=actions')) // https://github.com/marketplace (removes search params)
 console.log(normalizeUrl('https://github.com')) // https://github.com/ (adds ending "/")
 ```
 

@@ -9,7 +9,8 @@ const queryRecord = 'https://chromeuxreport.googleapis.com/v1/records:queryRecor
  * @typedef {{
  *    record: {
  *      key: {
- *        url: string,
+ *        url?: string,
+ *        origin?: string,
  *        effectiveConnectionType?: Connection,
  *        formFactor?: FormFactor
  *      },
@@ -78,7 +79,7 @@ export function createCruxApi(options) {
       }
       throw new Error(JSON.stringify(error))
     }
-    if (!json || (json && !json.record.key.url)) throw new Error(`Invalid response: ${JSON.stringify(json)}`)
+    if (!json || (json && !json.record.key)) throw new Error(`Invalid response: ${JSON.stringify(json)}`)
     return /** @type {SuccessResponse} */ (json)
   }
 }
