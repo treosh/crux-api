@@ -3,7 +3,7 @@ const queryRecord = 'https://chromeuxreport.googleapis.com/v1/records:queryRecor
 /**
  * @typedef {{ url?: string, origin?: string, formFactor?: FormFactor, effectiveConnectionType?: Connection }} FetchParams
  * @typedef {'ALL_FORM_FACTORS' | 'PHONE' | 'DESKTOP' | 'TABLET'} FormFactor
- * @typedef {'offline' | 'slow-2G' | '2G' | '3G' | '4G'} Connection
+ * @typedef {'4G' | '3G' | '2G' | 'slow-2G' | 'offline'} Connection
  * @typedef {{ histogram: { start: number | string, end: number | string, density: number }[], percentiles: { p75: number | string } }} MetricValue
  * @typedef {'first_contentful_paint' | 'largest_contentful_paint' | 'first_input_delay' | 'cumulative_layout_shift'} MetricName
  * @typedef {{

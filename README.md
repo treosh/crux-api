@@ -80,12 +80,16 @@ curl -d url='https://github.com/search' 'https://chromeuxreport.googleapis.com/v
 
 ### createCruxApi({ key: string, fetch?: function, maxRetries?: number, maxRetryTimeout?: number })
 
-- **options.key (required)**
-- **options.maxRetries (optional, default: 5)**
-- **options.maxRetryTimeout (optional, default: 60000)**
-- **options.fetch (optional)**
+- **options.key** (required) - CrUX API key, use https://goo.gle/crux-api-key to generate a new key;
+- **options.maxRetries** (optional, default: 5) - set retry limit for `429` error;
+- **options.maxRetryTimeout** (optional, default: 60000) - set a timeout after `429`, `crux-api` randomize value and in combination with `maxRetries` it may get the value faster;
+- **options.fetch** (optional, default: `window.fetch`) - pass a WHATWG fetch implementation for an environment where `window.fetch` does not exist.
 
 ### fetchCruxApi({ url?: string, origin?: string, formFactor?: FormFactor, effectiveConnectionType?: Connection })
+
+- **params.url** or **params.origin** (required)
+- **formFactor** (optional, default to all form factors) - `'PHONE' | 'DESKTOP' | 'TABLET'`
+- **effectiveConnectionType** (optional, default to all connections) - `'4G' | '3G' | '2G' | 'slow-2G' | 'offline'`
 
 ### normalizeUrl(url)
 
