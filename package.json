@@ -16,11 +16,13 @@
   "scripts": {
     "build": "microbundle build --no-sourcemap --format=cjs && yarn build:tsc",
     "build:tsc": "tsc --declaration --noEmit false --outDir dist/ --allowJs src/index.js && rm dist/index.js && mv dist/index.d.ts dist/crux-api.d.ts",
-    "test": "prettier -c src README.md && tsc -p . && size-limit",
+    "test": "ava && prettier -c src README.md && tsc -p . && size-limit",
     "prepack": "yarn build"
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "^4.6.0",
+    "ava": "^3.13.0",
+    "esm": "^3.2.25",
     "microbundle": "^0.12.4",
     "prettier": "^2.1.2",
     "size-limit": "^4.6.0",
@@ -45,8 +47,16 @@
   ],
   "size-limit": [
     {
-      "limit": "400B",
+      "limit": "450B",
       "path": "./src/index.js"
     }
-  ]
+  ],
+  "ava": {
+    "require": [
+      "esm"
+    ],
+    "files": [
+      "test/index.js"
+    ]
+  }
 }

@@ -1,10 +1,10 @@
 # crux-api
 
-> A tiny (400b) utility for Chrome UX Report API
+> A tiny (450b) utility for Chrome UX Report API
 
 **Features**:
 
-- A tiny (400b) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord)
+- A tiny (450b) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord)
 - TypeScript support for CrUX API params and response
 - Handles `404 (CrUX data not found)` and returns `null`
 - Handles `429 (Quota exceeded)` with an automatic retry
