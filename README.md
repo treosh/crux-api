@@ -6,8 +6,8 @@
 
 - A tiny (450b) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord)
 - TypeScript support for CrUX API params and response
-- Handles `404 (CrUX data not found)` and returns `null`
 - Handles `429 (Quota exceeded)` with an automatic retry
+- Handles `404 (CrUX data not found)` and returns `null`
 - URL normalization helper to match CrUX index key
 
 ## Usage
@@ -38,8 +38,8 @@ Fetch Origin-level data:
 import { createCruxApi } from 'crux-api'
 const fetchCruxApi = createCruxApi({ key: API_KEY })
 
-await fetchCruxApi({ origin: 'https://www.github.com' })
-await fetchCruxApi({ origin: 'https://www.github.com', formFactor: 'TABLET', effectiveConnectionType: '4G' })
+await fetchCruxApi({ origin: 'https://github.com/' })
+await fetchCruxApi({ origin: 'https://github.com/', formFactor: 'TABLET', effectiveConnectionType: '4G' })
 ```
 
 Normalize URL to match CrUX API index:
@@ -47,8 +47,21 @@ Normalize URL to match CrUX API index:
 ```js
 import { normalizeUrl, normalizeOrigin } from 'crux-api'
 
-console.log(normalizeUrl('https://github.com/search?q=crux-api')) // https://github.com/search (removes query params)
+console.log(normalizeUrl('https://github.com/marketplace?type=actions')) // https://github.com/marketplace (removes query params)
 console.log(normalizeUrl('https://github.com')) // https://github.com/ (adds ending "/")
+```
+
+Test API response with `curl`:
+
+```bash
+# get data for the URL without normalization
+curl -d url='https://github.com/marketplace?type=actions' -d effectiveConnectionType=4G -d formFactor=PHONE 'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=YOUR_KEY'
+
+# get origin data
+curl -d origin='https://github.com' -d formFactor=DESKTOP 'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=YOUR_KEY'
+
+# empty response (404)
+curl -d url='https://github.com/search' 'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=YOUR_KEY'
 ```
 
 ## Credits

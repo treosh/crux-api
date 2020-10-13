@@ -17,7 +17,9 @@ jobs:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: yarn-
-      - name: Install & Test
-        run: |
-          yarn install
-          yarn test
+      - name: Install deps
+        run: yarn install
+      - name: Test
+        run: yarn test
+        env:
+          CRUX_KEY: ${{ secrets.CRUX_KEY }}

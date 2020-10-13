@@ -62,7 +62,7 @@ export function createCruxApi(options) {
   async function fetchCruxApi(params, retryCounter = 1) {
     const apiEndpoint = `${queryRecord}?key=${key}`
     const res = await fetch(apiEndpoint, { method: 'POST', body: JSON.stringify(params) })
-    if (res.status !== 200) throw new Error(`Invalid status: ${res.status}`)
+    if (res.status >= 500) throw new Error(`Invalid CrUX API status: ${res.status}`)
 
     const json = await res.json()
     if (json && json.error) {
