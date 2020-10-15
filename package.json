@@ -1,7 +1,7 @@
 {
   "name": "crux-api",
   "version": "1.0.0",
-  "description": "A tiny (450b) utility that adds types and handles errors for Chrome UX Report API.",
+  "description": "A Chrome UX Report API wrapper that handles errors and provides types.",
   "repository": "https://github.com/treosh/crux-api",
   "bugs": "https://github.com/treosh/crux-api/issues",
   "license": "MIT",
