@@ -30,21 +30,9 @@ const queryRecord = 'https://chromeuxreport.googleapis.com/v1/records:queryRecor
  */
 
 /**
- * Fetch CrUX API.
+ * Fetch CrUX API and handles 4xx errors.
  * Inspired by: https://github.com/GoogleChrome/CrUX/blob/master/js/crux-api-util.js
  *
- * Handle errors:
- * {
- *   "code": 404,
- *   "message": "chrome ux report data not found",
- *   "status": "NOT_FOUND"
- * }
- * {
- *   "code":429,
- *   "message":"Quota exceeded for quota group 'default' and limit 'Queries per 100 seconds' of service 'chromeuxreport.googleapis.com' for consumer 'project_number:224801012400'.",
- *   "status":"RESOURCE_EXHAUSTED",
- *   "details":[{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Google developer console API key","url":"https://console.developers.google.com/project/224801012400/apiui/credential"}]}]
- * }
  * @param {{ key: string, fetch?: function, maxRetries?: number, maxRetryTimeout?: number }} options
  */
 
