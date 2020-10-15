@@ -3,16 +3,16 @@
 > A [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference) wrapper that handles errors and provides types.
 
 **Motivation**: [CrUX API](https://web.dev/chrome-ux-report-api/) is a fantastic tool to get RUM data without installing any script.
-While using the API in [Treo](https://treo.sh/), we discovered a few cases that required extra code: error responses, not found entries, API limits, URLs normalization, and lack of TypeScript notations. The `crux-api` library makes it easy to work with CrUX API in a browser and node.js by handling errors and providing TypeScript support.
+While using the API in [Treo](https://treo.sh/), we discovered a few cases that require extra code: error responses, not found entries, API limits, URLs normalization, TypeScript notations. The `crux-api` library makes it easy to work with CrUX API by handling errors and providing TypeScript support.
 
 **Features**:
 
-- A tiny (450b) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference);
-- TypeScript support for CrUX API [options and responses](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord);
+- A tiny (450 byte) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference);
+- TypeScript support for [options and responses](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord);
 - Returns `null` for `404 (CrUX data not found)` response;
-- Handles `429 (Quota exceeded)` response with an automatic retry;
-- URL normalization helper to match CrUX API index;
-- Works on a server with [`node-fetch`](https://www.npmjs.com/package/node-fetch).
+- Handles `429 (Quota exceeded)` response with automatic retries;
+- URL normalization helper to match the CrUX API index;
+- Works in a browser and node.js with [`node-fetch`](https://www.npmjs.com/package/node-fetch).
 
 ## Usage
 
@@ -47,7 +47,7 @@ const res2 = await fetchCruxApi({
 })
 ```
 
-Result is `null` or an `object` with [queryRecord response body](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord#response-body), for example:
+Result is `null` or an `object` with [queryRecord response body](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord#response-body), ex:
 
 ```json
 {
@@ -130,10 +130,10 @@ console.log(normalizeUrl('https://github.com')) // https://github.com/ (adds "/"
 The `crux-api` is designed to return data and automatically handles errors. It returns an object for `200` responses, retries after `429`, and returns `null` for `404`.
 For `400` and `5xx` it throws a relevant error.
 
-Below are all known responses of [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference) for easier debugging and development (The API documentation is vague about errors, and it would be great to know them all).
+Below are all known responses of [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference) for easier debugging and development (The API documentation is vague about errors, [please, submit an issue](https://github.com/treosh/crux-api/issues), if you know other responses).
 
 <details>
-  <summary>✅ 200: URL-level data.</summary><br>
+  <summary>✅ 200: URL-level data</summary><br>
 
 ```bash
 curl -d url='https://github.com/marketplace?type=actions' \
@@ -247,7 +247,7 @@ curl -d url='https://github.com/marketplace?type=actions' \
 </details>
 
 <details>
-  <summary>✅ 200: Origin-level data.</summary><br>
+  <summary>✅ 200: Origin-level data</summary><br>
 
 ```bash
 curl -d origin='https://github.com' \
@@ -355,7 +355,7 @@ curl -d origin='https://github.com' \
 </details>
 
 <details>
-  <summary>🛑 400 INVALID_ARGUMENT: API key not valid. Please pass a valid API key.</summary><br>
+  <summary>🛑 400 INVALID_ARGUMENT: API key not valid, please pass a valid API key</summary><br>
 
 ```bash
 curl -d origin='https://github.com' \
@@ -386,7 +386,7 @@ curl -d origin='https://github.com' \
 </details>
 
 <details>
-  <summary>🛑 400 INVALID_ARGUMENT: Invalid value at 'form_factor'/'ect'.</summary><br>
+  <summary>🛑 400 INVALID_ARGUMENT: Invalid value at 'form_factor'/'ect'</summary><br>
 
 ```bash
 curl -d url='https://github.com/' \
@@ -418,7 +418,7 @@ curl -d url='https://github.com/' \
 </details>
 
 <details>
-  <summary>🛑 404 NOT_FOUND: chrome ux report data not found.</summary><br>
+  <summary>🛑 404 NOT_FOUND: chrome ux report data not found</summary><br>
 
 ```bash
 curl -d url='https://github.com/search' \
@@ -438,7 +438,7 @@ curl -d url='https://github.com/search' \
 </details>
 
 <details>
-  <summary>🛑 429 RESOURCE_EXHAUSTED: Quota exceeded limit 'Queries per 100 seconds' of service.</summary><br>
+  <summary>🛑 429 RESOURCE_EXHAUSTED: Quota exceeded limit 'Queries per 100 seconds' of service</summary><br>
 
 ```bash
 curl -d url='https://github.com/search' \
