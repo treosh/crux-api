@@ -3,18 +3,16 @@
 > A tiny (450b) utility that handles errors and provides types for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference).
 
 **Motivation**: [CrUX API](https://web.dev/chrome-ux-report-api/) is a fantastic tool to get field data without installing any script.
-While using this API in [Treo](https://treo.sh/), we discovered some cases that required an extra code, like error responses, not found entries, API limits, URLs normalization, and lack of TS notations.
-
-`crux-api` makes it easy to work with CrUX API in browser and node.js by handling errors and providing TS support.
+While using the API in [Treo](https://treo.sh/), we discovered cases that required an extra code, like error responses, not found entries, API limits, URLs normalization, lack of TypeScript notations. `crux-api` makes it easy to work with CrUX API in Browser and Node by handling errors and providing TypeScript support.
 
 **Features**:
 
-- A tiny (450b) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord)
-- TypeScript support for CrUX API params and response
-- Handles `429 (Quota exceeded)` response with an automatic retry
-- Returns `null` for `404 (CrUX data not found)` response
-- URL normalization helper to match CrUX API index
-- Works on a server with [`node-fetch`](https://www.npmjs.com/package/node-fetch)
+- A tiny (450b) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord);
+- TypeScript support for CrUX API params and response;
+- Handles `429 (Quota exceeded)` response with an automatic retry;
+- Returns `null` for `404 (CrUX data not found)` response;
+- URL normalization helper to match CrUX API index;
+- Works on a server with [`node-fetch`](https://www.npmjs.com/package/node-fetch).
 
 ## Usage
 
@@ -22,12 +20,9 @@ Install:
 
 ```bash
 npm install crux-api
-
-# or with yarn
-yarn add crux-api
 ```
 
-Fetch URL-level data:
+Fetch URL-level data for a various form factors and connections:
 
 ```js
 import { createCruxApi } from 'crux-api'
@@ -38,19 +33,65 @@ await fetchCruxApi({ url: 'https://www.github.com/explore', formFactor: 'DESKTOP
 await fetchCruxApi({ url: 'https://www.github.com/marketplace', formFactor: 'PHONE', effectiveConnectionType: '3G' }) // fetch data for phones on 3G
 ```
 
-Fetch Origin-level data:
+Fetch origin-level data in Node.js using [`node-fetch`](https://www.npmjs.com/package/node-fetch):
 
 ```js
 import { createCruxApi } from 'crux-api'
-const fetchCruxApi = createCruxApi({ key: API_KEY })
+import nodeFetch from 'node-fetch'
+const fetchCruxApi = createCruxApi({ key: process.env.API_KEY, fetch: nodeFetch })
 
 await fetchCruxApi({ origin: 'https://github.com' })
 await fetchCruxApi({ origin: 'https://github.com', formFactor: 'TABLET', effectiveConnectionType: '4G' })
 ```
 
-## Responses of Chrome UX Report API
+## API
 
-Below, all known responses of [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference) for easier debugging and development.
+### createCruxApi(options)
+
+Returns a `fetchCruxApi` instance.
+
+- _options.key_ (**required**) - CrUX API key, use https://goo.gle/crux-api-key to generate a new key;
+- _options.fetch_ (optional, default: `window.fetch`) - pass a [WHATWG fetch](https://github.com/whatwg/fetch) implementation for a non-browser environment;
+- _options.maxRetries_ (optional, default: 5) and **options.maxRetryTimeout** (optional, default: 60000) - retry limit after `429` error and the maximum time to wait for a retry.
+
+### fetchCruxApi(queryRecordOptions)
+
+Fetches the API using [`queryRecord options`](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord):
+
+- _queryRecordOptions.url_ or _queryRecordOptions.origin_ (**required**) – the main identifier for a record lookup;
+- _queryRecordOptions.formFactor_ (optional, default to all form factors) - the form factor dimension: `PHONE` | `DESKTOP` | `TABLET`;
+- _queryRecordOptions.effectiveConnectionType_ (optional, default to all connections) - the effective network class: `4G` | `3G` | `2G` | `slow-2G` | `offline`.
+
+```js
+import { createCruxApi } from 'crux-api'
+
+// disable retries, throw 429 error, similar to 400 and 404
+const fetchCruxApi = createCruxApi({ key: process.env.API_KEY, maxRetries: 0 })
+
+await fetchCruxApi({
+  url: 'https://github.com/GoogleChrome/lighthouse',
+  formFactor: 'DESKTOP',
+  effectiveConnectionType: '4G',
+})
+```
+
+### normalizeUrl(url)
+
+Normalize a URL to match the CrUX API internal index.
+It is a URL's `origin` + `pathname` ([source](https://github.com/treosh/crux-api/blob/main/src/index.js#L93)).
+
+```js
+import { normalizeUrl } from 'crux-api'
+
+console.log(normalizeUrl('https://github.com/marketplace?type=actions')) // https://github.com/marketplace (removes search params)
+console.log(normalizeUrl('https://github.com')) // https://github.com/ (adds "/" to the end)
+```
+
+### Responses of CrUX API
+
+`crux-api` only resolves `200` responses, automatically retries for `429`, and returns `null` for `404`. For `400` and `5xx` it throws an error.
+
+Below are all known responses of [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference) for easier debugging and development.
 
 <details>
   <summary>✅ 200: URL-level data.</summary><br>
@@ -358,7 +399,7 @@ curl -d url='https://github.com/search' \
 </details>
 
 <details>
-  <summary>🛑 429 RESOURCE_EXHAUSTED: Quota exceeded for quota group 'default' and limit 'Queries per 100 seconds' of service.</summary><br>
+  <summary>🛑 429 RESOURCE_EXHAUSTED: Quota exceeded limit 'Queries per 100 seconds' of service.</summary><br>
 
 ```bash
 curl -d url='https://github.com/search' \
@@ -385,44 +426,6 @@ curl -d url='https://github.com/search' \
 ```
 
 </details>
-<br>
-
-## API
-
-### createCruxApi(options)
-
-- **options.key** (required) - CrUX API key, use https://goo.gle/crux-api-key to generate a new key;
-- **options.maxRetries** (optional, default: 5) - set retry limit for `429` error;
-- **options.maxRetryTimeout** (optional, default: 60000) - set a timeout after `429`, `crux-api` randomize value and in combination with `maxRetries` it may get the value faster;
-- **options.fetch** (optional, default: `window.fetch`) - pass a WHATWG fetch implementation for an environment where `window.fetch` does not exist.
-
-### fetchCruxApi({ url?: string, origin?: string, formFactor?: FormFactor, effectiveConnectionType?: Connection })
-
-- **params.url** or **params.origin** (required)
-- **formFactor** (optional, default to all form factors) - `'PHONE' | 'DESKTOP' | 'TABLET'`
-- **effectiveConnectionType** (optional, default to all connections) - `'4G' | '3G' | '2G' | 'slow-2G' | 'offline'`
-
-Use in Node.js with [`node-fetch`](https://www.npmjs.com/package/node-fetch):
-
-```js
-import { createCruxApi } from 'crux-api'
-import fetch from 'node-fetch'
-
-const fetchCruxApi = createCruxApi({ key: process.env.API_KEY, fetch })
-await fetchCruxApi({ url: 'https://github.com/GoogleChrome/lighthouse' })
-```
-
-### normalizeUrl(url)
-
-Normalize a URL to match the CrUX API internal index.
-It is a URL's `origin` + `pathname` ([source](https://github.com/treosh/crux-api/blob/main/src/index.js#L93)).
-
-```js
-import { normalizeUrl } from 'crux-api'
-
-console.log(normalizeUrl('https://github.com/marketplace?type=actions')) // https://github.com/marketplace (removes search params)
-console.log(normalizeUrl('https://github.com')) // https://github.com/ (adds "/" to the end)
-```
 
 ## Credits
 
