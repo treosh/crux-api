@@ -26,10 +26,10 @@ Fetch URL-level data for a various form factors and connections:
 
 ```js
 import { createCruxApi } from 'crux-api'
-const fetchCruxApi = createCruxApi({ key: API_KEY })
+const queryRecord = createCruxApi({ key: API_KEY })
 
-const res1 = await fetchCruxApi({ url: 'https://www.github.com/' }) // fetch all dimensions
-const res2 = await fetchCruxApi({ url: 'https://www.github.com/explore', formFactor: 'DESKTOP' }) // fetch data for desktop devices
+const res1 = await queryRecord({ url: 'https://www.github.com/' }) // fetch all dimensions
+const res2 = await queryRecord({ url: 'https://www.github.com/explore', formFactor: 'DESKTOP' }) // fetch data for desktop devices
 ```
 
 Fetch origin-level data in node.js using [`node-fetch`](https://www.npmjs.com/package/node-fetch):
@@ -37,10 +37,10 @@ Fetch origin-level data in node.js using [`node-fetch`](https://www.npmjs.com/pa
 ```js
 import { createCruxApi } from 'crux-api'
 import nodeFetch from 'node-fetch'
-const fetchCruxApi = createCruxApi({ key: process.env.API_KEY, fetch: nodeFetch })
+const queryRecord = createCruxApi({ key: process.env.API_KEY, fetch: nodeFetch })
 
-const res1 = await fetchCruxApi({ origin: 'https://github.com' })
-const res2 = await fetchCruxApi({
+const res1 = await queryRecord({ origin: 'https://github.com' })
+const res2 = await queryRecord({
   origin: 'https://www.github.com/marketplace?type=actions',
   formFactor: 'DESKTOP',
   effectiveConnectionType: '4G',
@@ -84,19 +84,19 @@ Result is `null` or an `object` with [queryRecord response body](https://develop
 
 ### createCruxApi(createOptions)
 
-Returns a `fetchCruxApi` instance.
+Returns a `queryRecord` instance.
 
 - _createOptions.key_ (**required**) - CrUX API key, use https://goo.gle/crux-api-key to generate a new key;
 - _createOptions.fetch_ (optional, default: `window.fetch`) - pass a [WHATWG fetch](https://github.com/whatwg/fetch) implementation for a non-browser environment;
 - _createOptions.maxRetries_ (optional, default: 5) and **options.maxRetryTimeout** (optional, default: 60000) - retry limit after `429` error and the maximum time to wait for a retry.
 
-### fetchCruxApi(fetchOptions)
+### queryRecord(queryOptions)
 
-Fetches the API using [`queryRecord options`](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord):
+Fetches CrUX API using [`queryRecord options`](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord):
 
-- _fetchOptions.url_ or _fetchOptions.origin_ (**required**) – the main identifier for a record lookup;
-- _fetchOptions.formFactor_ (optional, defaults to all form factors) - the form factor dimension: `PHONE` | `DESKTOP` | `TABLET`;
-- _fetchOptions.effectiveConnectionType_ (optional, defaults to all connections) - the effective network class: `4G` | `3G` | `2G` | `slow-2G` | `offline`.
+- _queryOptions.url_ or _queryOptions.origin_ (**required**) – the main identifier for a record lookup;
+- _queryOptions.formFactor_ (optional, defaults to all form factors) - the form factor dimension: `PHONE` | `DESKTOP` | `TABLET`;
+- _queryOptions.effectiveConnectionType_ (optional, defaults to all connections) - the effective network class: `4G` | `3G` | `2G` | `slow-2G` | `offline`.
 
 Returns a Promise with a raw [`queryRecord` response](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord#response-body) or `null` when the data is not found.
 
@@ -104,9 +104,9 @@ Returns a Promise with a raw [`queryRecord` response](https://developers.google.
 import { createCruxApi } from 'crux-api'
 
 // disable retries, throw 429 error, similar to 400 and 404
-const fetchCruxApi = createCruxApi({ key: process.env.API_KEY, maxRetries: 0 })
+const queryRecord = createCruxApi({ key: process.env.API_KEY, maxRetries: 0 })
 
-const res = await fetchCruxApi({
+const res = await queryRecord({
   url: 'https://github.com/marketplace?type=actions',
   formFactor: 'DESKTOP',
   effectiveConnectionType: '4G',

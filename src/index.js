@@ -41,14 +41,14 @@ export function createCruxApi(options) {
   const fetch = options.fetch || window.fetch
   const maxRetries = options.maxRetries || 5
   const maxRetryTimeout = options.maxRetryTimeout || 60 * 1000 // 60s
-  return fetchCruxApi
+  return queryRecord
 
   /**
    * @param {FetchParams} params
    * @return {Promise<SuccessResponse | null>}
    */
 
-  async function fetchCruxApi(params, retryCounter = 1) {
+  async function queryRecord(params, retryCounter = 1) {
     const apiEndpoint = `${queryRecord}?key=${key}`
     const res = await fetch(apiEndpoint, { method: 'POST', body: JSON.stringify(params) })
     if (res.status >= 500) throw new Error(`Invalid CrUX API status: ${res.status}`)
@@ -60,7 +60,7 @@ export function createCruxApi(options) {
       if (error.code === 429) {
         if (retryCounter <= maxRetries) {
           await new Promise((resolve) => setTimeout(resolve, random(maxRetryTimeout)))
-          return fetchCruxApi(params, retryCounter + 1)
+          return queryRecord(params, retryCounter + 1)
         } else {
           throw new Error('Max retries reached')
         }
