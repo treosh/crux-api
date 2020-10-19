@@ -14,8 +14,11 @@
     "src"
   ],
   "scripts": {
-    "build": "microbundle build --no-sourcemap --format=cjs && yarn build:tsc",
-    "build:tsc": "tsc --declaration --noEmit false --outDir dist/ --allowJs src/index.js && rm dist/index.js && mv dist/index.d.ts dist/crux-api.d.ts",
+    "build": "run-s build:*",
+    "build:src": "microbundle build --no-sourcemap --format=cjs",
+    "build:src-ts": "tsc --declaration --noEmit false --outDir dist/ --allowJs src/index.js && rm dist/index.js && mv dist/index.d.ts dist/crux-api.d.ts",
+    "build:batch": "rm -rf batch/dist && microbundle build --no-sourcemap --format=cjs --cwd batch",
+    "build:batch-ts": "tsc --declaration --noEmit false --outDir batch/dist --allowJs batch/src/index.js && mv batch/dist/index.d.ts batch/dist/crux-api-batch.d.ts && rm batch/dist/index.js",
     "test": "ava && prettier -c src README.md && tsc -p . && size-limit",
     "prepack": "yarn build"
   },
@@ -26,6 +29,7 @@
     "esm": "^3.2.25",
     "microbundle": "^0.12.4",
     "node-fetch": "^2.6.1",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.1.2",
     "size-limit": "^4.6.0",
     "typescript": "^4.0.3"
