@@ -168,7 +168,7 @@ console.log(normalizeUrl('https://github.com/marketplace?type=actions')) // http
 console.log(normalizeUrl('https://github.com')) // https://github.com/ (adds "/" to the end)
 ```
 
-### Responses of CrUX API
+### CrUX API Responses
 
 The `crux-api` is designed to return data and automatically handles errors. It returns an object for `200` responses, retries after `429`, and returns `null` for `404`.
 For `400` and `5xx` it throws a relevant error.

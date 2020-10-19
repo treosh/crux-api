@@ -1,6 +1,6 @@
 // usage: CRUX_KEY='...' node -r esm script/batch.js
 import nodeFetch from 'node-fetch'
-import { createBatch } from '../batch'
+import { createBatch } from '../batch/src'
 
 const key = process.env.CRUX_KEY || 'no-key'
 
