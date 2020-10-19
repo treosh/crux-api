@@ -10,5 +10,5 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": ["batch/src", "src", "test"]
+  "include": ["batch/src", "src", "test", "script"]
 }

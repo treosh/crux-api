@@ -1,11 +1,11 @@
 import test from 'ava'
 import fetch from 'node-fetch'
-import { createCruxApi, normalizeUrl } from '../src'
+import { createQueryRecord, normalizeUrl } from '../src'
 
 const key = process.env.CRUX_KEY || 'no-key'
 
-test('createCruxApi', async (t) => {
-  const queryRecord = createCruxApi({ key, fetch })
+test('createQueryRecord', async (t) => {
+  const queryRecord = createQueryRecord({ key, fetch })
   const json1 = await queryRecord({ url: 'https://github.com/', formFactor: 'DESKTOP' })
   t.truthy(json1)
   if (json1) {
@@ -22,7 +22,7 @@ test('createCruxApi', async (t) => {
 })
 
 test('normalizeUrl', async (t) => {
-  const queryRecord = createCruxApi({ key, fetch })
+  const queryRecord = createQueryRecord({ key, fetch })
   const urls = [
     ['https://www.gov.uk', 'https://www.gov.uk/'], // adds /
     ['https://hey.com/features/', 'https://hey.com/features/'], // no change, URL with /

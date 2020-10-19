@@ -25,8 +25,8 @@ npm install crux-api
 Fetch URL-level data for a various form factors and connections:
 
 ```js
-import { createCruxApi } from 'crux-api'
-const queryRecord = createCruxApi({ key: API_KEY })
+import { createQueryRecord } from 'crux-api'
+const queryRecord = createQueryRecord({ key: API_KEY })
 
 const res1 = await queryRecord({ url: 'https://www.github.com/' }) // fetch all dimensions
 const res2 = await queryRecord({ url: 'https://www.github.com/explore', formFactor: 'DESKTOP' }) // fetch data for desktop devices
@@ -35,9 +35,9 @@ const res2 = await queryRecord({ url: 'https://www.github.com/explore', formFact
 Fetch origin-level data in node.js using [`node-fetch`](https://www.npmjs.com/package/node-fetch):
 
 ```js
-import { createCruxApi } from 'crux-api'
+import { createQueryRecord } from 'crux-api'
 import nodeFetch from 'node-fetch'
-const queryRecord = createCruxApi({ key: process.env.API_KEY, fetch: nodeFetch })
+const queryRecord = createQueryRecord({ key: process.env.API_KEY, fetch: nodeFetch })
 
 const res1 = await queryRecord({ origin: 'https://github.com' })
 const res2 = await queryRecord({
@@ -82,7 +82,7 @@ Result is `null` or an `object` with [queryRecord response body](https://develop
 
 ## API
 
-### createCruxApi(createOptions)
+### createQueryRecord(createOptions)
 
 Returns a `queryRecord` instance.
 
@@ -101,10 +101,10 @@ Fetches CrUX API using [`queryRecord options`](https://developers.google.com/web
 Returns a Promise with a raw [`queryRecord` response](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord#response-body) or `null` when the data is not found.
 
 ```js
-import { createCruxApi } from 'crux-api'
+import { createQueryRecord } from 'crux-api'
 
 // disable retries, throw 429 error, similar to 400 and 404
-const queryRecord = createCruxApi({ key: process.env.API_KEY, maxRetries: 0 })
+const queryRecord = createQueryRecord({ key: process.env.API_KEY, maxRetries: 0 })
 
 const res = await queryRecord({
   url: 'https://github.com/marketplace?type=actions',
