@@ -23,7 +23,6 @@ export function createBatch(createOptions) {
 
   async function batch(batchOptions) {
     const body = generateBatchBody(batchOptions, key)
-    console.log(body)
     const res = await fetch('https://chromeuxreport.googleapis.com/batch/', {
       method: 'POST',
       headers: { 'Content-Type': `multipart/mixed; boundary=${boundary}` },

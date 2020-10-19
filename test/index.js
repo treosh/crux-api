@@ -1,3 +1,4 @@
+// yarn ava test/index.js
 import test from 'ava'
 import fetch from 'node-fetch'
 import { createQueryRecord, normalizeUrl } from '../src'
