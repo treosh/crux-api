@@ -19,7 +19,7 @@
     "build:src-ts": "tsc --declaration --noEmit false --outDir dist/ --allowJs src/index.js && rm dist/index.js && mv dist/index.d.ts dist/crux-api.d.ts",
     "build:batch": "rm -rf batch/dist && microbundle build --no-sourcemap --format=cjs --cwd batch",
     "build:batch-ts": "tsc --declaration --noEmit false --outDir batch/dist --allowJs batch/src/index.js && mv batch/dist/index.d.ts batch/dist/crux-api-batch.d.ts && rm batch/dist/index.js",
-    "test": "ava && prettier -c src README.md && tsc -p . && size-limit",
+    "test": "ava && prettier -c src test batch/src README.md && tsc -p . && size-limit",
     "prepack": "yarn build"
   },
   "devDependencies": {
@@ -37,6 +37,7 @@
   "keywords": [
     "CrUX",
     "CrUX API",
+    "Batch API",
     "Chrome User Experience Report",
     "Chrome UX Report",
     "Core Web Vitals",
@@ -55,6 +56,10 @@
     {
       "limit": "450B",
       "path": "./src/index.js"
+    },
+    {
+      "limit": "550B",
+      "path": "./batch/src/index.js"
     }
   ],
   "ava": {
