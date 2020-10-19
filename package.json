@@ -1,6 +1,6 @@
 {
   "name": "crux-api",
-  "version": "1.0.0",
+  "version": "1.1.0-beta1",
   "description": "A Chrome UX Report API wrapper that handles errors and provides types.",
   "repository": "https://github.com/treosh/crux-api",
   "bugs": "https://github.com/treosh/crux-api/issues",
@@ -10,13 +10,17 @@
   "types": "dist/crux-api.d.ts",
   "main": "dist/crux-api.js",
   "files": [
+    "batch",
     "dist",
     "src"
   ],
   "scripts": {
-    "build": "microbundle build --no-sourcemap --format=cjs && yarn build:tsc",
-    "build:tsc": "tsc --declaration --noEmit false --outDir dist/ --allowJs src/index.js && rm dist/index.js && mv dist/index.d.ts dist/crux-api.d.ts",
-    "test": "ava && prettier -c src README.md && tsc -p . && size-limit",
+    "build": "run-s build:*",
+    "build:src": "microbundle build --no-sourcemap --format=cjs",
+    "build:src-ts": "tsc --declaration --noEmit false --outDir dist/ --allowJs src/index.js && rm dist/index.js && mv dist/index.d.ts dist/crux-api.d.ts",
+    "build:batch": "rm -rf batch/dist && microbundle build --no-sourcemap --format=cjs --cwd batch",
+    "build:batch-ts": "tsc --declaration --noEmit false --outDir batch/dist --allowJs batch/src/index.js && mv batch/dist/index.d.ts batch/dist/crux-api-batch.d.ts && rm batch/dist/index.js",
+    "test": "ava -v && prettier -c src batch/src test script README.md && tsc -p . && size-limit",
     "prepack": "yarn build"
   },
   "devDependencies": {
@@ -26,6 +30,7 @@
     "esm": "^3.2.25",
     "microbundle": "^0.12.4",
     "node-fetch": "^2.6.1",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.1.2",
     "size-limit": "^4.6.0",
     "typescript": "^4.0.3"
@@ -33,6 +38,7 @@
   "keywords": [
     "CrUX",
     "CrUX API",
+    "Batch API",
     "Chrome User Experience Report",
     "Chrome UX Report",
     "Core Web Vitals",
@@ -51,6 +57,10 @@
     {
       "limit": "450B",
       "path": "./src/index.js"
+    },
+    {
+      "limit": "500B",
+      "path": "./batch/src/index.js"
     }
   ],
   "ava": {
@@ -58,7 +68,7 @@
       "esm"
     ],
     "files": [
-      "test/index.js"
+      "test/*.js"
     ]
   }
 }

@@ -1,19 +1,20 @@
+// yarn ava test/index.js
 import test from 'ava'
 import fetch from 'node-fetch'
-import { createCruxApi, normalizeUrl } from '../src'
+import { createQueryRecord, normalizeUrl } from '../src'
 
 const key = process.env.CRUX_KEY || 'no-key'
 
-test('createCruxApi', async (t) => {
-  const fetchCruxApi = createCruxApi({ key, fetch })
-  const json1 = await fetchCruxApi({ url: 'https://github.com/', formFactor: 'DESKTOP' })
+test('createQueryRecord', async (t) => {
+  const queryRecord = createQueryRecord({ key, fetch })
+  const json1 = await queryRecord({ url: 'https://github.com/', formFactor: 'DESKTOP' })
   t.truthy(json1)
   if (json1) {
     t.is(json1.record.key.url, 'https://github.com/')
     t.is(json1.record.key.formFactor, 'DESKTOP')
   }
 
-  const json2 = await fetchCruxApi({ origin: 'https://github.com', effectiveConnectionType: '3G' })
+  const json2 = await queryRecord({ origin: 'https://github.com', effectiveConnectionType: '3G' })
   t.truthy(json2)
   if (json2) {
     t.is(json2.record.key.origin, 'https://github.com')
@@ -22,7 +23,7 @@ test('createCruxApi', async (t) => {
 })
 
 test('normalizeUrl', async (t) => {
-  const fetchCruxApi = createCruxApi({ key, fetch })
+  const queryRecord = createQueryRecord({ key, fetch })
   const urls = [
     ['https://www.gov.uk', 'https://www.gov.uk/'], // adds /
     ['https://hey.com/features/', 'https://hey.com/features/'], // no change, URL with /
@@ -31,7 +32,7 @@ test('normalizeUrl', async (t) => {
   ]
   for (const [unnormalizedUrl, cruxUrl] of urls) {
     t.is(normalizeUrl(unnormalizedUrl), cruxUrl)
-    const json = await fetchCruxApi({ url: unnormalizedUrl })
+    const json = await queryRecord({ url: unnormalizedUrl })
     if (!json) throw new Error(`No JSON for ${unnormalizedUrl}`)
     t.is(json.record.key.url, cruxUrl)
   }

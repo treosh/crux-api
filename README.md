@@ -8,11 +8,12 @@ While using the API in [Treo](https://treo.sh/), we discovered a few cases that 
 **Features**:
 
 - A tiny (450 byte) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference);
+- [Batch API support](https://developers.google.com/web/tools/chrome-user-experience-report/api/guides/batch) for up to 1000 records per one request;
 - TypeScript support for [options and responses](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord);
-- Returns `null` for `404 (CrUX data not found)` response;
-- Handles `429 (Quota exceeded)` response with automatic retries;
+- Returns `null` for the `404 (CrUX data not found)` response;
+- Handles the `429 (Quota exceeded)` response with automatic retries;
 - URL normalization helper to match the CrUX API index;
-- Works in a browser and node.js with [`node-fetch`](https://www.npmjs.com/package/node-fetch).
+- Isomorphic: works in a browser and node.js;
 
 ## Usage
 
@@ -25,22 +26,22 @@ npm install crux-api
 Fetch URL-level data for a various form factors and connections:
 
 ```js
-import { createCruxApi } from 'crux-api'
-const fetchCruxApi = createCruxApi({ key: API_KEY })
+import { createQueryRecord } from 'crux-api'
+const queryRecord = createQueryRecord({ key: CRUX_API_KEY })
 
-const res1 = await fetchCruxApi({ url: 'https://www.github.com/' }) // fetch all dimensions
-const res2 = await fetchCruxApi({ url: 'https://www.github.com/explore', formFactor: 'DESKTOP' }) // fetch data for desktop devices
+const res1 = await queryRecord({ url: 'https://www.github.com/' }) // fetch all dimensions
+const res2 = await queryRecord({ url: 'https://www.github.com/explore', formFactor: 'DESKTOP' }) // fetch data for desktop devices
 ```
 
 Fetch origin-level data in node.js using [`node-fetch`](https://www.npmjs.com/package/node-fetch):
 
 ```js
-import { createCruxApi } from 'crux-api'
+import { createQueryRecord } from 'crux-api'
 import nodeFetch from 'node-fetch'
-const fetchCruxApi = createCruxApi({ key: process.env.API_KEY, fetch: nodeFetch })
+const queryRecord = createQueryRecord({ key: process.env.CRUX_API_KEY, fetch: nodeFetch })
 
-const res1 = await fetchCruxApi({ origin: 'https://github.com' })
-const res2 = await fetchCruxApi({
+const res1 = await queryRecord({ origin: 'https://github.com' })
+const res2 = await queryRecord({
   origin: 'https://www.github.com/marketplace?type=actions',
   formFactor: 'DESKTOP',
   effectiveConnectionType: '4G',
@@ -80,37 +81,79 @@ Result is `null` or an `object` with [queryRecord response body](https://develop
 }
 ```
 
+Use the [CrUX Batch API](https://developers.google.com/web/tools/chrome-user-experience-report/api/guides/batch) to combine multiple requests into one:
+
+```js
+import { createBatch } from 'crux-api/batch'
+const batch = createBatch({ key: CRUX_API_KEY })
+
+const records = await batch([
+  { origin: 'https://github.com' }
+  { url: 'https://github.com/marketplace', formFactor: 'DESKTOP' },
+  { url: 'https://github.com/', formFactor: 'MOBILE', effectiveConnectionType: '4G' },
+  { url: 'https://www.github.com/explore', formFactor: 'TABLET' },
+])
+```
+
 ## API
 
-### createCruxApi(createOptions)
+### Single Record Request
 
-Returns a `fetchCruxApi` instance.
+#### createQueryRecord(createQueryOptions)
 
-- _createOptions.key_ (**required**) - CrUX API key, use https://goo.gle/crux-api-key to generate a new key;
-- _createOptions.fetch_ (optional, default: `window.fetch`) - pass a [WHATWG fetch](https://github.com/whatwg/fetch) implementation for a non-browser environment;
-- _createOptions.maxRetries_ (optional, default: 5) and **options.maxRetryTimeout** (optional, default: 60000) - retry limit after `429` error and the maximum time to wait for a retry.
+Returns a `queryRecord` function.
 
-### fetchCruxApi(fetchOptions)
+- _createQueryOptions.key_ (**required**) - CrUX API key, use https://goo.gle/crux-api-key to generate a new key;
+- _createQueryOptions.fetch_ (optional, default: `window.fetch`) - pass a [WHATWG fetch](https://github.com/whatwg/fetch) implementation for a non-browser environment;
+- _createQueryOptions.maxRetries_ (optional, default: 5) and **options.maxRetryTimeout** (optional, default: 60000) - retry limit after `429` error and the maximum time to wait for a retry.
 
-Fetches the API using [`queryRecord options`](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord):
+#### queryRecord(queryOptions)
 
-- _fetchOptions.url_ or _fetchOptions.origin_ (**required**) – the main identifier for a record lookup;
-- _fetchOptions.formFactor_ (optional, defaults to all form factors) - the form factor dimension: `PHONE` | `DESKTOP` | `TABLET`;
-- _fetchOptions.effectiveConnectionType_ (optional, defaults to all connections) - the effective network class: `4G` | `3G` | `2G` | `slow-2G` | `offline`.
+Fetches CrUX API using [`queryRecord options`](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord):
+
+- _queryOptions.url_ or _queryOptions.origin_ (**required**) – the main identifier for a record lookup;
+- _queryOptions.formFactor_ (optional, defaults to all form factors) - the form factor dimension: `PHONE` | `DESKTOP` | `TABLET`;
+- _queryOptions.effectiveConnectionType_ (optional, defaults to all connections) - the effective network class: `4G` | `3G` | `2G` | `slow-2G` | `offline`.
 
 Returns a Promise with a raw [`queryRecord` response](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord#response-body) or `null` when the data is not found.
 
 ```js
-import { createCruxApi } from 'crux-api'
+import { createQueryRecord } from 'crux-api'
 
 // disable retries, throw 429 error, similar to 400 and 404
-const fetchCruxApi = createCruxApi({ key: process.env.API_KEY, maxRetries: 0 })
+const queryRecord = createQueryRecord({ key: process.env.CRUX_API_KEY, maxRetries: 0 })
 
-const res = await fetchCruxApi({
+const res = await queryRecord({
   url: 'https://github.com/marketplace?type=actions',
   formFactor: 'DESKTOP',
   effectiveConnectionType: '4G',
 })
+```
+
+### Batch Request
+
+#### createBatch(createBatchOptions)
+
+Returns a `batch` function.
+
+- _createBatchOptions.key_ (**required**) - CrUX API key;
+- _createBatchOptions.fetch_ (optional, default: `window.fetch`) - a [WHATWG fetch](https://github.com/whatwg/fetch) polyfill;
+
+#### batch(batchOptions)
+
+An array of [queryRecord](#queryrecordqueryoptions) options.
+
+```js
+import nodeFetch from 'node-fetch'
+import { createBatch } from 'crux-api/batch'
+
+const batch = createBatch({ key: process.env.CRUX_KEY, fetch: nodeFetch })
+const res = await batch([
+  { origin: 'https://example.com' },
+  { url: 'https://github.com/', formFactor: 'DESKTOP' },
+  { origin: 'https://fooo.bar' },
+])
+console.log(JSON.stringify(res, null, '  '))
 ```
 
 ### normalizeUrl(url)
@@ -125,7 +168,7 @@ console.log(normalizeUrl('https://github.com/marketplace?type=actions')) // http
 console.log(normalizeUrl('https://github.com')) // https://github.com/ (adds "/" to the end)
 ```
 
-### Responses of CrUX API
+### CrUX API Responses
 
 The `crux-api` is designed to return data and automatically handles errors. It returns an object for `200` responses, retries after `429`, and returns `null` for `404`.
 For `400` and `5xx` it throws a relevant error.
@@ -139,7 +182,7 @@ Below are all known responses of [Chrome UX Report API](https://developers.googl
 curl -d url='https://github.com/marketplace?type=actions' \
      -d effectiveConnectionType=4G \
      -d formFactor=PHONE \
-     'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=API_KEY'
+     'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=CRUX_API_KEY'
 ```
 
 ```json
@@ -252,7 +295,7 @@ curl -d url='https://github.com/marketplace?type=actions' \
 ```bash
 curl -d origin='https://github.com' \
      -d formFactor=DESKTOP \
-     'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=API_KEY'
+     'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=CRUX_API_KEY'
 ```
 
 ```json
@@ -391,7 +434,7 @@ curl -d origin='https://github.com' \
 ```bash
 curl -d url='https://github.com/' \
      -d formFactor=mobile  \
-     'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=API_KEY'
+     'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=CRUX_API_KEY'
 ```
 
 ```json
@@ -422,7 +465,7 @@ curl -d url='https://github.com/' \
 
 ```bash
 curl -d url='https://github.com/search' \
-     'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=API_KEY'
+     'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=CRUX_API_KEY'
 ```
 
 ```json
@@ -442,7 +485,7 @@ curl -d url='https://github.com/search' \
 
 ```bash
 curl -d url='https://github.com/search' \
-     'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=API_KEY'
+     'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=CRUX_API_KEY'
 ```
 
 ```json
