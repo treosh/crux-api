@@ -1,6 +1,6 @@
 {
   "name": "crux-api",
-  "version": "1.0.0",
+  "version": "1.1.0.beta1",
   "description": "A Chrome UX Report API wrapper that handles errors and provides types.",
   "repository": "https://github.com/treosh/crux-api",
   "bugs": "https://github.com/treosh/crux-api/issues",
@@ -10,6 +10,7 @@
   "types": "dist/crux-api.d.ts",
   "main": "dist/crux-api.js",
   "files": [
+    "batch",
     "dist",
     "src"
   ],
@@ -67,7 +68,7 @@
       "esm"
     ],
     "files": [
-      "test/index.js"
+      "test/*.js"
     ]
   }
 }
