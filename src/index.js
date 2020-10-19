@@ -1,7 +1,5 @@
-const queryRecord = 'https://chromeuxreport.googleapis.com/v1/records:queryRecord'
-
 /**
- * @typedef {{ url?: string, origin?: string, formFactor?: FormFactor, effectiveConnectionType?: Connection }} FetchParams
+ * @typedef {{ url?: string, origin?: string, formFactor?: FormFactor, effectiveConnectionType?: Connection }} QueryRecordOptions
  * @typedef {'ALL_FORM_FACTORS' | 'PHONE' | 'DESKTOP' | 'TABLET'} FormFactor
  * @typedef {'4G' | '3G' | '2G' | 'slow-2G' | 'offline'} Connection
  * @typedef {{ histogram: { start: number | string, end: number | string, density: number }[], percentiles: { p75: number | string } }} MetricValue
@@ -44,12 +42,12 @@ export function createCruxApi(options) {
   return queryRecord
 
   /**
-   * @param {FetchParams} params
+   * @param {QueryRecordOptions} params
    * @return {Promise<SuccessResponse | null>}
    */
 
   async function queryRecord(params, retryCounter = 1) {
-    const apiEndpoint = `${queryRecord}?key=${key}`
+    const apiEndpoint = `https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=${key}`
     const res = await fetch(apiEndpoint, { method: 'POST', body: JSON.stringify(params) })
     if (res.status >= 500) throw new Error(`Invalid CrUX API status: ${res.status}`)
 
