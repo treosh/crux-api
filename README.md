@@ -1,6 +1,6 @@
 # crux-api
 
-> A [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference) wrapper that handles errors and provides types.
+> A [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference) wrapper that handles errors, provides types, and supports batching.
 
 **Motivation**: [CrUX API](https://web.dev/chrome-ux-report-api/) is a fantastic tool to get RUM data without installing any script.
 While using the API in [Treo](https://treo.sh/), we discovered a few cases that require extra code: error responses, not found entries, API limits, URLs normalization, TypeScript notations. The `crux-api` library makes it easy to work with CrUX API by handling errors and providing TypeScript support.
