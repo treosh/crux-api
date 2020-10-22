@@ -3,7 +3,7 @@
 > A [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference) wrapper that supports batching, handles errors, and provides types.
 
 **Motivation**: [CrUX API](https://web.dev/chrome-ux-report-api/) is a fantastic tool to get RUM data without installing any script.
-While using the API in [Treo](https://treo.sh/), we discovered a few complex cases like API errors and limits, not found entries, a complicated multipart response from the batch API, URLs normalization, and TypeScript notations. So we decided to build the `crux-api` library to makes it easier to work with the CrUX API.
+While using the API in [Treo](https://treo.sh/), we discovered a few complex cases like API errors, rate limits, not found entries, a complicated multipart response from the batch API, URLs normalization, and TypeScript notations. We decided to build the `crux-api` library to makes it easier to work with the CrUX API.
 
 **Features**:
 
@@ -129,17 +129,15 @@ const res = await queryRecord({
 // res -> URL-level data for https://github.com/marketplace
 ```
 
-### Batching Requests
+### Batch Request
 
-It uses a separate namespace because a different API powers it. And it's bigger (850 bytes) due to the complexity of constructing and parsing multipart requests.
-
-It uses the [CrUX Batch API](https://developers.google.com/web/tools/chrome-user-experience-report/api/guides/batch), which allows combining 1000 calls in a single batch request.
+`crux-api/batch` uses the [CrUX Batch API](https://developers.google.com/web/tools/chrome-user-experience-report/api/guides/batch), which allows combining 1000 calls in a single batch request. It's a separate namespace because the API is different, and it's bigger (850 bytes) due to the complexity of constructing and parsing multipart requests.
 
 _Note_: A set of `n` requests batched together counts toward your usage limit as `n` requests, not as one request. That's why the sometimes a batch response contains `429` responses. But the `crux-api` automatically retries these responses, aiming always to return the data you need.
 
 #### createBatch(createOptions)
 
-Accepts the same [`createOptions` as the `createQueryRecord`](https://github.com/treosh/crux-api/tree/batch-api-limits#createqueryrecordcreateoptions) and returns a `batch` function.
+Accepts the same [`createOptions` as the `createQueryRecord`](#createqueryrecordcreateoptions) and returns a `batch` function.
 
 #### batch(batchOptions)
 
@@ -164,7 +162,7 @@ const res = await batch([
 ### normalizeUrl(url)
 
 Normalize a URL to match the CrUX API internal index.
-It is a URL's `origin` + `pathname` ([source](https://github.com/treosh/crux-api/blob/main/src/index.js#L81)).
+It is a URL's `origin` + `pathname` ([source](./src/index.js#76)).
 
 ```js
 import { normalizeUrl } from 'crux-api'
