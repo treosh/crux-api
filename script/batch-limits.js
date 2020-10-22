@@ -79,7 +79,7 @@ async function main() {
         }
       }
       return memo
-    }, /** @type {import('../batch/src').BatchOptions} */ ([]))
+    }, /** @type {import('../src').BatchOptions} */ ([]))
   )
   await fs.writeFile(join(__dirname, `../result/origins${suffix}.json`), JSON.stringify(res1, null, '  '))
   console.timeEnd('fetch origins')
@@ -93,7 +93,7 @@ async function main() {
         }
       }
       return memo
-    }, /** @type {import('../batch/src').BatchOptions} */ ([]))
+    }, /** @type {import('../src').BatchOptions} */ ([]))
   )
   await fs.writeFile(join(__dirname, `../result/urls${suffix}.json`), JSON.stringify(res2, null, '  '))
   console.timeEnd('fetch urls')

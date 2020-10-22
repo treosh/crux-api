@@ -1,10 +1,16 @@
+import { randomDelay } from './utils'
+
 /**
- * @typedef {{ key: string, fetch?: function, maxRetries?: number, maxRetryTimeout?: number }} CreateQueryRecordOptions
+ * @typedef {{ key: string, fetch?: function, maxRetries?: number, maxRetryTimeout?: number }} CreateOptions
  * @typedef {{ url?: string, origin?: string, formFactor?: FormFactor, effectiveConnectionType?: Connection }} QueryRecordOptions
+ * @typedef {QueryRecordOptions[]} BatchOptions
+ * @typedef {(SuccessResponse | null)[]} BatchResponse
+ *
  * @typedef {'ALL_FORM_FACTORS' | 'PHONE' | 'DESKTOP' | 'TABLET'} FormFactor
  * @typedef {'4G' | '3G' | '2G' | 'slow-2G' | 'offline'} Connection
  * @typedef {{ histogram: { start: number | string, end: number | string, density: number }[], percentiles: { p75: number | string } }} MetricValue
  * @typedef {'first_contentful_paint' | 'largest_contentful_paint' | 'first_input_delay' | 'cumulative_layout_shift'} MetricName
+ * @typedef {{ error: { code: number, message: string, status: string } }} ErrorResponse
  * @typedef {{
  *    record: {
  *      key: {
@@ -25,14 +31,13 @@
  *      normalizedUrl: string
  *    }
  * }} SuccessResponse
- * @typedef {{ error: { code: number, message: string, status: string } }} ErrorResponse
  */
 
 /**
  * Fetch CrUX API and handles 4xx errors.
  * Inspired by: https://github.com/GoogleChrome/CrUX/blob/master/js/crux-api-util.js
  *
- * @param {CreateQueryRecordOptions} createOptions
+ * @param {CreateOptions} createOptions
  */
 
 export function createQueryRecord(createOptions) {
@@ -58,7 +63,7 @@ export function createQueryRecord(createOptions) {
       if (error.code === 404) return null
       if (error.code === 429) {
         if (retryCounter <= maxRetries) {
-          await new Promise((resolve) => setTimeout(resolve, random(maxRetryTimeout)))
+          await randomDelay(maxRetryTimeout)
           return queryRecord(queryOptions, retryCounter + 1)
         } else {
           throw new Error('Max retries reached')
@@ -80,15 +85,4 @@ export function createQueryRecord(createOptions) {
 export function normalizeUrl(url) {
   const u = new URL(url)
   return u.origin + u.pathname
-}
-
-/**
- * Random from 1 to `max`.
- * Based on: https://stackoverflow.com/a/29246176
- *
- * @param {number} max
- */
-
-function random(max) {
-  return Math.floor(Math.random() * max) + 1
 }
