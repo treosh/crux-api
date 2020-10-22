@@ -43,8 +43,8 @@ import { randomDelay } from './utils'
 export function createQueryRecord(createOptions) {
   const key = createOptions.key
   const fetch = createOptions.fetch || window.fetch
-  const maxRetries = createOptions.maxRetries || 5
-  const maxRetryTimeout = createOptions.maxRetryTimeout || 60 * 1000 // 60s
+  const maxRetries = createOptions.maxRetries || 10
+  const maxRetryTimeout = createOptions.maxRetryTimeout || 100 * 1000 // 100s
   return queryRecord
 
   /**

@@ -14,7 +14,7 @@ export function createBatch(createOptions) {
   const key = createOptions.key
   const fetch = createOptions.fetch || window.fetch
   const maxRetries = createOptions.maxRetries || 10
-  const maxRetryTimeout = createOptions.maxRetryTimeout || 60 * 1000 // 60s
+  const maxRetryTimeout = createOptions.maxRetryTimeout || 100 * 1000 // 100s
   return batch
 
   /**
@@ -55,8 +55,9 @@ export function createBatch(createOptions) {
           batchValues[index].result = json
         }
       })
-      const hasRateLimitedRequests = batchValues.some(({ result }) => result === undefined)
-      if (hasRateLimitedRequests) {
+      const rateLimitedRequests = batchValues.filter(({ result }) => result === undefined)
+      if (rateLimitedRequests.length) {
+        console.log('Rate-limit #%s: %s/%s', retryCounter, rateLimitedRequests.length, results.length)
         if (retryCounter <= maxRetries) {
           await randomDelay(maxRetryTimeout)
           return batchRequest(retryCounter + 1)

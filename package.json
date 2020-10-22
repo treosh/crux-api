@@ -59,7 +59,7 @@
       "path": "./src/index.js"
     },
     {
-      "limit": "800B",
+      "limit": "850B",
       "path": "./batch/src/index.js"
     }
   ],
