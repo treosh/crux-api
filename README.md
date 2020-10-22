@@ -105,7 +105,6 @@ Returns a `queryRecord` function.
 
 - _createOptions.key_ (**required**) - CrUX API key, use https://goo.gle/crux-api-key to generate a new key;
 - _createOptions.fetch_ (optional, default: `window.fetch`) - pass a [WHATWG fetch](https://github.com/whatwg/fetch) implementation for a non-browser environment;
-- _createOptions.maxRetries_ (optional, default: 10) and **options.maxRetryTimeout** (optional, default: 100000) - retry limit after `429` error and the maximum time to wait for a retry.
 
 #### queryRecord(queryOptions)
 
@@ -120,18 +119,19 @@ Returns a Promise with a raw [`queryRecord` response](https://developers.google.
 ```js
 import { createQueryRecord } from 'crux-api'
 
-// disable retries, throw 429 error, similar to 400 and 404
-const queryRecord = createQueryRecord({ key: process.env.CRUX_API_KEY, maxRetries: 0 })
-
+const queryRecord = createQueryRecord({ key: process.env.CRUX_API_KEY })
 const res = await queryRecord({
   url: 'https://github.com/marketplace?type=actions',
   formFactor: 'DESKTOP',
   effectiveConnectionType: '4G',
 })
+
+// res -> URL-level data for https://github.com/marketplace
 ```
 
 ### Batch Request
 
+It uses a separate namespace, because it's powered by a different API.
 It's heavier (850 bytes) due to a complexity of constructing and parsing multipart requests.
 
 #### createBatch(createOptions)

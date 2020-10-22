@@ -1,7 +1,7 @@
-import { randomDelay } from './utils'
+import { retryAfterTimeout } from './retry'
 
 /**
- * @typedef {{ key: string, fetch?: function, maxRetries?: number, maxRetryTimeout?: number }} CreateOptions
+ * @typedef {{ key: string, fetch?: function }} CreateOptions
  * @typedef {{ url?: string, origin?: string, formFactor?: FormFactor, effectiveConnectionType?: Connection }} QueryRecordOptions
  * @typedef {QueryRecordOptions[]} BatchOptions
  * @typedef {(SuccessResponse | null)[]} BatchResponse
@@ -43,8 +43,6 @@ import { randomDelay } from './utils'
 export function createQueryRecord(createOptions) {
   const key = createOptions.key
   const fetch = createOptions.fetch || window.fetch
-  const maxRetries = createOptions.maxRetries || 10
-  const maxRetryTimeout = createOptions.maxRetryTimeout || 100 * 1000 // 100s
   return queryRecord
 
   /**
@@ -61,14 +59,7 @@ export function createQueryRecord(createOptions) {
     if (json && json.error) {
       const { error } = /** @type {ErrorResponse} */ (json)
       if (error.code === 404) return null
-      if (error.code === 429) {
-        if (retryCounter <= maxRetries) {
-          await randomDelay(maxRetryTimeout)
-          return queryRecord(queryOptions, retryCounter + 1)
-        } else {
-          throw new Error('Max retries reached')
-        }
-      }
+      if (error.code === 429) return retryAfterTimeout(retryCounter, () => queryRecord(queryOptions, retryCounter + 1))
       throw new Error(JSON.stringify(error))
     }
     if (!json || (json && !json.record.key)) throw new Error(`Invalid response: ${JSON.stringify(json)}`)

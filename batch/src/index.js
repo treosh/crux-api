@@ -1,11 +1,11 @@
-import { randomDelay } from '../../src/utils'
-
-/** @typedef {{ options: import('../../src').QueryRecordOptions, result: import('../../src').SuccessResponse | null | undefined }[]} BatchValues */
+import { retryAfterTimeout } from '../../src/retry'
 const boundary = 'BATCH_BOUNDARY'
 
 /**
  * Create batch interface for CrUX API.
  * https://developers.google.com/web/tools/chrome-user-experience-report/api/guides/batch
+ *
+ * @typedef {{ options: import('../../src').QueryRecordOptions, result: import('../../src').SuccessResponse | null | undefined }[]} BatchValues
  *
  * @param {import('../../src').CreateOptions} createOptions
  */
@@ -13,8 +13,6 @@ const boundary = 'BATCH_BOUNDARY'
 export function createBatch(createOptions) {
   const key = createOptions.key
   const fetch = createOptions.fetch || window.fetch
-  const maxRetries = createOptions.maxRetries || 10
-  const maxRetryTimeout = createOptions.maxRetryTimeout || 100 * 1000 // 100s
   return batch
 
   /**
@@ -58,12 +56,7 @@ export function createBatch(createOptions) {
       const rateLimitedRequests = batchValues.filter(({ result }) => result === undefined)
       if (rateLimitedRequests.length) {
         console.log('Rate-limit #%s: %s/%s', retryCounter, rateLimitedRequests.length, results.length)
-        if (retryCounter <= maxRetries) {
-          await randomDelay(maxRetryTimeout)
-          return batchRequest(retryCounter + 1)
-        } else {
-          throw new Error('Max retries reached')
-        }
+        return retryAfterTimeout(retryCounter, () => batchRequest(retryCounter + 1))
       }
       return batchValues.map(({ result }) => /** @type {import('../../src').SuccessResponse | null} */ (result))
     }
