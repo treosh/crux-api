@@ -1,6 +1,6 @@
 /** @typedef {{ key: string, fetch?: function }} CreateBatchOptions */
 /** @typedef {import('../../src').QueryRecordOptions[]} BatchOptions */
-/** @typedef {(import('../../src').SuccessResponse | import('../../src').ErrorResponse)[]} BatchResponse */
+/** @typedef {(import('../../src').SuccessResponse | null)[]} BatchResponse */
 
 const boundary = 'BATCH_BOUNDARY'
 
@@ -208,7 +208,7 @@ ${JSON.stringify(queryRecordOptions, null, '  ')}
  */
 
 function parseBatchResponse(text) {
-  const res = /** @type {BatchResponse} */ ([])
+  const results = /** @type {BatchResponse} */ ([])
   let index = /** @type {number | null} */ (null)
   let contentBody = ''
   for (const line of text.split('\n')) {
@@ -220,14 +220,23 @@ function parseBatchResponse(text) {
       contentBody += line
     }
     if (index && contentBody && line.startsWith('}')) {
-      res[
-        index - 1
-      ] = /** @type {import('../../src').SuccessResponse | import('../../src').ErrorResponse} */ (JSON.parse(
-        contentBody
-      ))
+      const json = JSON.parse(contentBody)
+      let res = /** @type {import('../../src').SuccessResponse | null} */ (json)
+      if (json && json.error) {
+        const { error } = /** @type {import('../../src').ErrorResponse} */ (json)
+        if (error.code === 404) {
+          res = null
+        } else if (error.code === 429) {
+          // TODO: collect failed results & restart
+          res = null
+        } else {
+          throw new Error(JSON.stringify(error))
+        }
+      }
+      results[index - 1] = res
       index = null
       contentBody = ''
     }
   }
-  return res
+  return results
 }
