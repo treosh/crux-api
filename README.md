@@ -3,7 +3,7 @@
 > A [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference) wrapper that supports batching, handles errors, and provides types.
 
 **Motivation**: [CrUX API](https://web.dev/chrome-ux-report-api/) is a fantastic tool to get RUM data without installing any script.
-While using the API in [Treo](https://treo.sh/), we discovered a few complications like API errors and limits, not found entries, a complicated multipart response from the batch API, URLs normalization, TypeScript notations. The `crux-api` library makes it easy to work with CrUX API by supporting batch requests, handling errors, and providing TypeScript notations.
+While using the API in [Treo](https://treo.sh/), we discovered a few complex cases like API errors and limits, not found entries, a complicated multipart response from the batch API, URLs normalization, and TypeScript notations. So we decided to build the `crux-api` library to makes it easier to work with the CrUX API.
 
 **Features**:
 
@@ -129,10 +129,13 @@ const res = await queryRecord({
 // res -> URL-level data for https://github.com/marketplace
 ```
 
-### Batch Request
+### Batching Requests
 
-It uses a separate namespace, because it's powered by a different API.
-It's heavier (850 bytes) due to a complexity of constructing and parsing multipart requests.
+It uses a separate namespace because a different API powers it. And it's bigger (850 bytes) due to the complexity of constructing and parsing multipart requests.
+
+It uses the [CrUX Batch API](https://developers.google.com/web/tools/chrome-user-experience-report/api/guides/batch), which allows combining 1000 calls in a single batch request.
+
+_Note_: A set of `n` requests batched together counts toward your usage limit as `n` requests, not as one request. That's why the sometimes a batch response contains `429` responses. But the `crux-api` automatically retries these responses, aiming always to return the data you need.
 
 #### createBatch(createOptions)
 
