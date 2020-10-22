@@ -1,14 +1,13 @@
-/** @typedef {{ key: string, fetch?: function }} CreateBatchOptions */
-/** @typedef {import('../../src').QueryRecordOptions[]} BatchOptions */
-/** @typedef {(import('../../src').SuccessResponse | import('../../src').ErrorResponse)[]} BatchResponse */
-
+import { retryAfterTimeout } from '../../src/retry'
 const boundary = 'BATCH_BOUNDARY'
 
 /**
  * Create batch interface for CrUX API.
  * https://developers.google.com/web/tools/chrome-user-experience-report/api/guides/batch
  *
- * @param {CreateBatchOptions} createOptions
+ * @typedef {{ options: import('../../src').QueryRecordOptions, result: import('../../src').SuccessResponse | null | undefined }[]} BatchValues
+ *
+ * @param {import('../../src').CreateOptions} createOptions
  */
 
 export function createBatch(createOptions) {
@@ -17,20 +16,50 @@ export function createBatch(createOptions) {
   return batch
 
   /**
-   * @param {BatchOptions} batchOptions
-   * @return {Promise<BatchResponse>}
+   * @param {import('../../src').BatchOptions} batchOptions
+   *
    */
 
-  async function batch(batchOptions) {
-    const body = generateBatchBody(batchOptions, key)
-    const res = await fetch('https://chromeuxreport.googleapis.com/batch/', {
-      method: 'POST',
-      headers: { 'Content-Type': `multipart/mixed; boundary=${boundary}` },
-      body,
-    })
-    const text = await res.text()
-    if (res.status !== 200) throw new Error(`Invalid batch response: ${text}`)
-    return parseBatchResponse(text)
+  function batch(batchOptions) {
+    const batchValues = /** @type {BatchValues} */ (batchOptions.map((options) => ({ options, result: undefined })))
+    return batchRequest(1)
+
+    /**
+     * @param {number} retryCounter
+     * @return {Promise<import('../../src').BatchResponse>}
+     */
+
+    async function batchRequest(retryCounter) {
+      const body = generateBatchBody(batchValues, key)
+      const res = await fetch('https://chromeuxreport.googleapis.com/batch/', {
+        method: 'POST',
+        headers: { 'Content-Type': `multipart/mixed; boundary=${boundary}` },
+        body,
+      })
+      const text = await res.text()
+      if (res.status !== 200) throw new Error(`Invalid batch response: ${text}`)
+      const results = parseBatchResponse(text)
+      results.forEach(({ index, json }) => {
+        if (!json) {
+          throw new Error('Empty result')
+        } else if (json.error) {
+          const { error } = /** @type {import('../../src').ErrorResponse} */ (json)
+          if (error.code === 404) {
+            batchValues[index].result = null
+          } else if (error.code !== 429) {
+            throw new Error(JSON.stringify(error))
+          }
+        } else {
+          batchValues[index].result = json
+        }
+      })
+      const rateLimitedRequests = batchValues.filter(({ result }) => result === undefined)
+      if (rateLimitedRequests.length) {
+        console.log('Rate-limit #%s: %s/%s', retryCounter, rateLimitedRequests.length, results.length)
+        return retryAfterTimeout(retryCounter, () => batchRequest(retryCounter + 1))
+      }
+      return batchValues.map(({ result }) => /** @type {import('../../src').SuccessResponse | null} */ (result))
+    }
   }
 }
 
@@ -53,13 +82,15 @@ export function createBatch(createOptions) {
  *
  * --BATCH_BOUNDARY--
  *
- * @param {BatchOptions} batchOptions
+ * @param {BatchValues} batchValues
  * @param {string} key
  */
 
-function generateBatchBody(batchOptions, key) {
-  const strOpts = batchOptions.map((queryRecordOptions, index) => {
-    return `--${boundary}
+function generateBatchBody(batchValues, key) {
+  let str = ''
+  batchValues.forEach(({ options, result }, index) => {
+    if (result !== undefined) return
+    str += `--${boundary}
 Content-Type: application/http
 Content-ID: ${index + 1}
 
@@ -67,10 +98,11 @@ POST /v1/records:queryRecord?key=${key}
 Content-Type: application/json
 Accept: application/json
 
-${JSON.stringify(queryRecordOptions, null, '  ')}
+${JSON.stringify(options, null, '  ')}
+
 `
   })
-  return strOpts.join('\n') + `\n--${boundary}--`
+  return `${str}\n--${boundary}--`
 }
 
 /**
@@ -208,7 +240,7 @@ ${JSON.stringify(queryRecordOptions, null, '  ')}
  */
 
 function parseBatchResponse(text) {
-  const res = /** @type {BatchResponse} */ ([])
+  const results = /** @type {{ index: number, json: any }[]} */ ([])
   let index = /** @type {number | null} */ (null)
   let contentBody = ''
   for (const line of text.split('\n')) {
@@ -220,14 +252,10 @@ function parseBatchResponse(text) {
       contentBody += line
     }
     if (index && contentBody && line.startsWith('}')) {
-      res[
-        index - 1
-      ] = /** @type {import('../../src').SuccessResponse | import('../../src').ErrorResponse} */ (JSON.parse(
-        contentBody
-      ))
+      results.push({ index: index - 1, json: JSON.parse(contentBody) })
       index = null
       contentBody = ''
     }
   }
-  return res
+  return results
 }
