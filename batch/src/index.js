@@ -5,9 +5,9 @@ const boundary = 'BATCH_BOUNDARY'
  * Create batch interface for CrUX API.
  * https://developers.google.com/web/tools/chrome-user-experience-report/api/guides/batch
  *
- * @typedef {{ options: import('../../src').QueryRecordOptions, result: import('../../src').SuccessResponse | null | undefined }[]} BatchValues
+ * @typedef {{ options: import('../..').QueryRecordOptions, result: import('../..').SuccessResponse | null | undefined }[]} BatchValues
  *
- * @param {import('../../src').CreateOptions} createOptions
+ * @param {import('../..').CreateOptions} createOptions
  */
 
 export function createBatch(createOptions) {
@@ -16,7 +16,7 @@ export function createBatch(createOptions) {
   return batch
 
   /**
-   * @param {import('../../src').BatchOptions} batchOptions
+   * @param {import('../..').BatchOptions} batchOptions
    *
    */
 
@@ -26,7 +26,7 @@ export function createBatch(createOptions) {
 
     /**
      * @param {number} retryCounter
-     * @return {Promise<import('../../src').BatchResponse>}
+     * @return {Promise<import('../..').BatchResponse>}
      */
 
     async function batchRequest(retryCounter) {
@@ -43,7 +43,7 @@ export function createBatch(createOptions) {
         if (!json) {
           throw new Error('Empty result')
         } else if (json.error) {
-          const { error } = /** @type {import('../../src').ErrorResponse} */ (json)
+          const { error } = /** @type {import('../..').ErrorResponse} */ (json)
           if (error.code === 404) {
             batchValues[index].result = null
           } else if (error.code !== 429) {
@@ -58,7 +58,7 @@ export function createBatch(createOptions) {
         console.log('Rate-limit #%s: %s/%s', retryCounter, rateLimitedRequests.length, results.length)
         return retryAfterTimeout(retryCounter, () => batchRequest(retryCounter + 1))
       }
-      return batchValues.map(({ result }) => /** @type {import('../../src').SuccessResponse | null} */ (result))
+      return batchValues.map(({ result }) => /** @type {import('../..').SuccessResponse | null} */ (result))
     }
   }
 }
