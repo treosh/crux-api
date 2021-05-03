@@ -1,6 +1,6 @@
 {
   "name": "crux-api",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A Chrome UX Report API wrapper wrapper that supports batching, handles errors, and provides types.",
   "repository": "https://github.com/treosh/crux-api",
   "bugs": "https://github.com/treosh/crux-api/issues",
