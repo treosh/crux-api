@@ -20,7 +20,7 @@
     "build:src-ts": "tsc --declaration --noEmit false --outDir dist/ --allowJs src/index.js && rm dist/index.js && mv dist/index.d.ts dist/crux-api.d.ts",
     "build:batch": "rm -rf batch/dist && microbundle build --no-sourcemap --format=cjs --cwd batch",
     "build:batch-ts": "tsc --declaration --noEmit false --outDir batch/dist --allowJs batch/src/index.js && mv batch/dist/batch/src/index.d.ts batch/dist/crux-api-batch.d.ts && rm -rf batch/dist/{src,batch}",
-    "test": "ava -v && prettier -c src batch/src test script README.md && tsc -p . && size-limit",
+    "test": "ava -v && prettier -c src batch/src test script README.md && yarn build && tsc -p . && size-limit",
     "prepack": "yarn build"
   },
   "devDependencies": {
