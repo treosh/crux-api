@@ -1,6 +1,6 @@
 # crux-api
 
-> A [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference) wrapper that supports batching, handles errors, and provides types.
+> A [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference) wrapper that handles errors, retries, and provides types.
 
 **Motivation**: [CrUX API](https://web.dev/chrome-ux-report-api/) is a fantastic tool to get RUM data without installing any script.
 While using the API in [Treo](https://treo.sh/), we discovered a few complex cases like API errors, rate limits, not found entries, a complicated multipart response from the batch API, URLs normalization, and TypeScript notations. We decided to build the `crux-api` library to makes it easier to work with the CrUX API.
@@ -8,7 +8,6 @@ While using the API in [Treo](https://treo.sh/), we discovered a few complex cas
 **Features**:
 
 - A tiny (450 bytes) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference);
-- [Batch API support](https://developers.google.com/web/tools/chrome-user-experience-report/api/guides/batch) for up to 1000 records per one request;
 - TypeScript notations for [options and responses](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord);
 - Isomorphic: works in a browser and node.js;
 - Returns `null` for the `404 (CrUX data not found)` response;
@@ -31,20 +30,6 @@ const queryRecord = createQueryRecord({ key: CRUX_API_KEY })
 
 const res1 = await queryRecord({ url: 'https://www.github.com/' }) // fetch all dimensions
 const res2 = await queryRecord({ url: 'https://www.github.com/explore', formFactor: 'DESKTOP' }) // fetch data for desktop devices
-```
-
-Use the [CrUX Batch API](https://developers.google.com/web/tools/chrome-user-experience-report/api/guides/batch) to combine up to 1000 requests and get results in less than 1 second:
-
-```js
-import { createBatch } from 'crux-api/batch'
-const batch = createBatch({ key: CRUX_API_KEY })
-
-const records = await batch([
-  { url: 'https://github.com/', formFactor: 'MOBILE', effectiveConnectionType: '4G' },
-  { url: 'https://github.com/marketplace', formFactor: 'DESKTOP' },
-  { url: 'https://www.github.com/explore', formFactor: 'TABLET' },
-  // ... up to 1000 records.
-])
 ```
 
 Fetch origin-level data in node.js using [`node-fetch`](https://www.npmjs.com/package/node-fetch):
@@ -97,9 +82,7 @@ Result is `null` or an `object` with [queryRecord response body](https://develop
 
 ## API
 
-### Single Record Request
-
-#### createQueryRecord(createOptions)
+### createQueryRecord(createOptions)
 
 Returns a `queryRecord` function.
 
@@ -127,36 +110,6 @@ const res = await queryRecord({
 })
 
 // res -> URL-level data for https://github.com/marketplace
-```
-
-### Batch Request
-
-`crux-api/batch` uses the [CrUX Batch API](https://developers.google.com/web/tools/chrome-user-experience-report/api/guides/batch), which allows combining 1000 calls in a single batch request. It's a separate namespace because the API is different, and it's bigger (850 bytes) due to the complexity of constructing and parsing multipart requests.
-
-_Note_: A set of `n` requests batched together counts toward your usage limit as `n` requests, not as one request. That's why the sometimes a batch response contains `429` responses. But the `crux-api` automatically retries these responses, aiming always to return the data you need.
-
-#### createBatch(createOptions)
-
-Accepts the same [`createOptions` as the `createQueryRecord`](#createqueryrecordcreateoptions) and returns a `batch` function.
-
-#### batch(batchOptions)
-
-Accepts an array of [`queryRecord`](#queryrecordqueryoptions) options and returns an array with an exact position for each record. If the record doesn't exist in CrUX index, the value set to null. If some requests hit rate-limit, `batch` will retry them after a short timeout.
-
-```js
-import { createBatch } from 'crux-api/batch'
-import nodeFetch from 'node-fetch'
-
-const batch = createBatch({ key: process.env.CRUX_KEY, fetch: nodeFetch })
-const res = await batch([
-  { origin: 'https://example.com' },
-  { url: 'https://github.com/', formFactor: 'DESKTOP' },
-  { origin: 'https://fooo.bar' },
-])
-
-// res[0] -> origin-level data for https://example.com
-// res[1] -> URL-level data for https://github.com/ on desktop devices
-// res[2] -> null (invalid origin that not found in the CrUX index)
 ```
 
 ### normalizeUrl(url)

@@ -1,7 +1,7 @@
 {
   "name": "crux-api",
-  "version": "1.1.1",
-  "description": "A Chrome UX Report API wrapper wrapper that supports batching, handles errors, and provides types.",
+  "version": "2.0.0",
+  "description": "A Chrome UX Report API wrapper wrapper that handles errors and provides types",
   "repository": "https://github.com/treosh/crux-api",
   "bugs": "https://github.com/treosh/crux-api/issues",
   "license": "MIT",
@@ -10,7 +10,6 @@
   "types": "dist/crux-api.d.ts",
   "main": "dist/crux-api.js",
   "files": [
-    "batch",
     "dist",
     "src"
   ],
@@ -18,9 +17,7 @@
     "build": "run-s build:*",
     "build:src": "microbundle build --no-sourcemap --format=cjs",
     "build:src-ts": "tsc --declaration --noEmit false --outDir dist/ --allowJs src/index.js && rm dist/index.js && mv dist/index.d.ts dist/crux-api.d.ts",
-    "build:batch": "rm -rf batch/dist && microbundle build --no-sourcemap --format=cjs --cwd batch",
-    "build:batch-ts": "tsc --declaration --noEmit false --outDir batch/dist --allowJs batch/src/index.js && mv batch/dist/batch/src/index.d.ts batch/dist/crux-api-batch.d.ts && rm -rf batch/dist/{src,batch}",
-    "test": "ava -v && prettier -c src batch/src test script README.md && yarn build && tsc -p . && size-limit",
+    "test": "ava -v && prettier -c src test script README.md && yarn build && tsc -p . && size-limit",
     "prepack": "yarn build"
   },
   "devDependencies": {
@@ -38,7 +35,6 @@
   "keywords": [
     "CrUX",
     "CrUX API",
-    "Batch API",
     "Chrome User Experience Report",
     "Chrome UX Report",
     "Core Web Vitals",
@@ -57,10 +53,6 @@
     {
       "limit": "450B",
       "path": "./src/index.js"
-    },
-    {
-      "limit": "850B",
-      "path": "./batch/src/index.js"
     }
   ],
   "ava": {

@@ -26,7 +26,7 @@ test('normalizeUrl', async (t) => {
   const queryRecord = createQueryRecord({ key, fetch })
   const urls = [
     ['https://www.gov.uk', 'https://www.gov.uk/'], // adds /
-    ['https://hey.com/features/', 'https://hey.com/features/'], // no change, URL with /
+    ['https://www.hey.com/features/', 'https://www.hey.com/features/'], // no change, URL with /
     ['https://stripe.com/docs/api', 'https://stripe.com/docs/api'], // no change, URL without /
     ['https://github.com/marketplace?type=actions', 'https://github.com/marketplace'], // removes search params
   ]

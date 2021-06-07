@@ -1,11 +1,9 @@
-import { retryAfterTimeout } from './retry'
+const maxRetries = 10
+const maxRetryTimeout = 60 * 1000 // 60s
 
 /**
  * @typedef {{ key: string, fetch?: function }} CreateOptions
  * @typedef {{ url?: string, origin?: string, formFactor?: FormFactor, effectiveConnectionType?: Connection }} QueryRecordOptions
- * @typedef {QueryRecordOptions[]} BatchOptions
- * @typedef {(SuccessResponse | null)[]} BatchResponse
- *
  * @typedef {'ALL_FORM_FACTORS' | 'PHONE' | 'DESKTOP' | 'TABLET'} FormFactor
  * @typedef {'4G' | '3G' | '2G' | 'slow-2G' | 'offline'} Connection
  * @typedef {{ histogram: { start: number | string, end: number | string, density: number }[], percentiles: { p75: number | string } }} MetricValue
@@ -76,4 +74,22 @@ export function createQueryRecord(createOptions) {
 export function normalizeUrl(url) {
   const u = new URL(url)
   return u.origin + u.pathname
+}
+
+/**
+ * Random delay from 1ms to `maxRetryTimeout`.
+ * Random logic is based on: https://stackoverflow.com/a/29246176
+ *
+ * @param {number} retryCounter
+ * @param {function} request
+ */
+
+export async function retryAfterTimeout(retryCounter, request) {
+  if (retryCounter <= maxRetries) {
+    const timeout = Math.floor(Math.random() * maxRetryTimeout) + 1
+    await new Promise((resolve) => setTimeout(resolve, timeout))
+    return request()
+  } else {
+    throw new Error('Max retries reached')
+  }
 }
