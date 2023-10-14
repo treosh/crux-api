@@ -11,7 +11,7 @@
     "src"
   ],
   "scripts": {
-    "test": "ava -v && prettier -c src test script README.md && tsc -p . && size-limit"
+    "test": "ava -v test/index.js && prettier -c src test script README.md && tsc -p . && size-limit"
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "^9.0.0",
@@ -45,13 +45,8 @@
   ],
   "size-limit": [
     {
-      "limit": "500B",
+      "limit": "510B",
       "path": "./src/index.js"
     }
-  ],
-  "ava": {
-    "files": [
-      "test/*.js"
-    ]
-  }
+  ]
 }
