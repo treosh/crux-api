@@ -7,11 +7,14 @@
   "license": "MIT",
   "type": "module",
   "source": "src/index.js",
+  "types": "types/index.d.ts",
   "files": [
-    "src"
+    "src",
+    "types"
   ],
   "scripts": {
-    "test": "ava -v test/index.js && prettier -c src test script README.md && tsc -p . && size-limit"
+    "types": "tsc --declaration --emitDeclarationOnly --noEmit false --outDir types/ --allowJs src/index.js",
+    "test": "yarn types && ava -v test/index.js && prettier -c src test script README.md && tsc -p . && size-limit"
   },
   "devDependencies": {
     "@size-limit/preset-small-lib": "^9.0.0",
