@@ -71,6 +71,8 @@ Result is `null` or an `object` with [queryRecord response body](https://develop
       "cumulative_layout_shift": { ... },
       "first_input_delay": { ... },
       "largest_contentful_paint": { ... },
+      "interaction_to_next_paint": { ... },
+      "experimental_time_to_first_byte": { ... },
     }
   },
   "urlNormalizationDetails": {

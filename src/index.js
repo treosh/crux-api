@@ -7,7 +7,8 @@ const maxRetryTimeout = 60 * 1000 // 60s
  * @typedef {'ALL_FORM_FACTORS' | 'PHONE' | 'DESKTOP' | 'TABLET'} FormFactor
  * @typedef {'4G' | '3G' | '2G' | 'slow-2G' | 'offline'} Connection
  * @typedef {{ histogram: { start: number | string, end: number | string, density: number }[], percentiles: { p75: number | string } }} MetricValue
- * @typedef {'first_contentful_paint' | 'largest_contentful_paint' | 'first_input_delay' | 'cumulative_layout_shift'} MetricName
+ * @typedef {{ year: number, month: number, day: number }} MetricDate
+ * @typedef {{ firstDate: MetricDate, lastDate: MetricDate }} CollectionPeriod
  * @typedef {{ error: { code: number, message: string, status: string } }} ErrorResponse
  * @typedef {{
  *    record: {
@@ -22,7 +23,10 @@ const maxRetryTimeout = 60 * 1000 // 60s
  *        largest_contentful_paint?: MetricValue,
  *        first_input_delay?: MetricValue,
  *        cumulative_layout_shift?: MetricValue,
- *      }
+ *        interaction_to_next_paint?: MetricValue,
+ *        experimental_time_to_first_byte?: MetricValue,
+ *      },
+ *      collectionPeriod: CollectionPeriod
  *    },
  *    urlNormalizationDetails?: {
  *      originalUrl: string,
