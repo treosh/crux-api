@@ -1,18 +1,19 @@
 # crux-api
 
-> A [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference) wrapper that handles errors, retries, and provides types.
+> A tiny [CrUX API](https://developer.chrome.com/docs/crux/api/) wrapper that supports record & history API, handles errors, and provides types.
 
-**Motivation**: [CrUX API](https://web.dev/chrome-ux-report-api/) is a fantastic tool to get RUM data without installing any script.
-While using the API in [Treo](https://treo.sh/), we discovered a few complex cases like API errors, rate limits, not found entries, a complicated multipart response from the batch API, URLs normalization, and TypeScript notations. We decided to build the `crux-api` library to makes it easier to work with the CrUX API.
+**Motivation**: [CrUX API](https://developer.chrome.com/docs/crux/api/) is a fantastic tool to get RUM data without installing any script.
+While using the API in [Treo](https://treo.sh/), we discovered a few complex cases like API errors, rate limits, not found entries, URLs normalization, and TypeScript notations. We decided to build the `crux-api` library to make working with the CrUX API easier.
 
 **Features**:
 
 - A tiny (500 bytes) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference);
-- TypeScript notations for [options and responses](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord);
+- Supports both the [record](https://developer.chrome.com/docs/crux/api/) & [history](https://developer.chrome.com/docs/crux/history-api/) API;
+- TypeScript notations for [options and responses](https://developer.chrome.com/docs/crux/api/#request-body);
 - Isomorphic: works in a browser and node.js;
 - Returns `null` for the `404 (CrUX data not found)` response;
 - Automatic retry when hits the API rate limits: `429 (Quota exceeded)`;
-- URL normalization helper to match the CrUX API index;
+- URL normalization helper to check the CrUX API index;
 
 ## Usage
 
@@ -22,39 +23,23 @@ Install:
 npm install crux-api
 ```
 
-Fetch URL-level data for a various form factors and connections:
+**Fetch URL-level data for a various form factors and connections**:
 
 ```js
 import { createQueryRecord } from 'crux-api'
 const queryRecord = createQueryRecord({ key: CRUX_API_KEY })
 
-const res1 = await queryRecord({ url: 'https://www.github.com/' }) // fetch all dimensions
-const res2 = await queryRecord({ url: 'https://www.github.com/explore', formFactor: 'DESKTOP' }) // fetch data for desktop devices
+// fetch all dimensions
+const jsonRecord = await queryRecord({ url: 'https://github.com/marketplace?type=actions', formFactor: 'DESKTOP' })
 ```
 
-Fetch origin-level data in node.js using [`node-fetch`](https://www.npmjs.com/package/node-fetch):
-
-```js
-import { createQueryRecord } from 'crux-api'
-import nodeFetch from 'node-fetch'
-const queryRecord = createQueryRecord({ key: process.env.CRUX_API_KEY, fetch: nodeFetch })
-
-const res1 = await queryRecord({ origin: 'https://github.com' })
-const res2 = await queryRecord({
-  origin: 'https://www.github.com/marketplace?type=actions',
-  formFactor: 'DESKTOP',
-  effectiveConnectionType: '4G',
-})
-```
-
-Result is `null` or an `object` with [queryRecord response body](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord#response-body), ex:
+The `jsonRecord` is `null` or an `object` with [queryRecord response body](https://developer.chrome.com/docs/crux/api/#response-body), ex:
 
 ```json
 {
   "record": {
     "key": {
       "formFactor": "DESKTOP",
-      "effectiveConnectionType": "4G",
       "url": "https://github.com/marketplace"
     },
     "metrics": {
@@ -78,6 +63,55 @@ Result is `null` or an `object` with [queryRecord response body](https://develop
   "urlNormalizationDetails": {
     "originalUrl": "https://github.com/marketplace?type=actions",
     "normalizedUrl": "https://github.com/marketplace"
+  }
+}
+```
+
+**Fetch historic data for a URL**:
+
+```js
+import { createQueryRecord } from 'crux-api'
+const queryRecord = createQueryHistoryRecord({ key: CRUX_API_KEY })
+
+const jsonHistory = await queryRecord({ url: 'https://www.github.com/' }) // fetch ALL_FORM_FACTORS
+```
+
+The `jsonHistory` is `null` or an `object` with [queryRecord response body](https://developer.chrome.com/docs/crux/history-api/#response-body), ex:
+
+```json
+{
+  "record": {
+    "key": {
+      "url": "https://github.com/"
+    },
+    "metrics": {
+      "cumulative_layout_shift": {
+        "histogramTimeseries": [
+          {
+            "start": "0.00",
+            "end": "0.10",
+            "densities": [0.716522216796875, 0.672149658203125, ..., 0.892669677734375]
+          },
+          {
+            "start": "0.10",
+            "end": "0.25",
+            "densities": [0.244537353515625, 0.246917724609375, ..., 0.086090087890625]
+          },
+          {
+            "start": "0.25",
+            "densities": [0.0389404296875, 0.0809326171875, ..., 0.021240234375]
+          }
+        ],
+        "percentilesTimeseries": {
+          "p75s": ["0.10", "0.12", ..., "0.05"]
+        }
+      },
+      "experimental_time_to_first_byte": { ... },
+      "first_contentful_paint": { ... },
+      "first_input_delay": { ... },
+      "interaction_to_next_paint": { ... },
+      "largest_contentful_paint": { ... }
+    }
   }
 }
 ```

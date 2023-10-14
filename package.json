@@ -1,7 +1,7 @@
 {
   "name": "crux-api",
   "version": "3.0.0",
-  "description": "A tiny CrUX API wrapper that handles errors and provides types",
+  "description": "A tiny CrUX API wrapper that supports record & history API, handles errors, and provides types.",
   "repository": "https://github.com/treosh/crux-api",
   "bugs": "https://github.com/treosh/crux-api/issues",
   "license": "MIT",
