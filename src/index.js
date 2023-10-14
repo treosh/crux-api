@@ -33,27 +33,68 @@ const maxRetryTimeout = 60 * 1000 // 60s
  *      normalizedUrl: string
  *    }
  * }} SuccessResponse
+ *
+ * @typedef {(?number | string)[]} PercentileValues
+ * @typedef {{ start: number, end?: number, densities: (number | 'NaN')[] }} HistorgramTimeserie
+ * @typedef {{
+ *    histogramTimeseries: HistorgramTimeserie[],
+ *    percentilesTimeseries: { p75s: PercentileValues }
+ * }} HistoryValue
+ *
+ * @typedef {{
+ *    record: {
+ *      key: {
+ *        url?: string,
+ *        origin?: string,
+ *        formFactor?: FormFactor
+ *      },
+ *      metrics: {
+ *        first_input_delay?: HistoryValue,
+ *        first_contentful_paint?: HistoryValue,
+ *        largest_contentful_paint?: HistoryValue,
+ *        cumulative_layout_shift?: HistoryValue,
+ *        interaction_to_next_paint?: HistoryValue,
+ *        experimental_time_to_first_byte?: HistoryValue,
+ *      }
+ *      collectionPeriods: CollectionPeriod[]
+ *    },
+ *    urlNormalizationDetails?: {
+ *      originalUrl: string,
+ *      normalizedUrl: string
+ *    },
+ * }} HistoryResponse
  */
+
+/** @param {CreateOptions} createOptions @return {function(QueryRecordOptions): Promise<SuccessResponse | null>} */
+export function createQueryRecord(createOptions) {
+  return createQueryCruxApi({ ...createOptions, api: 'record' })
+}
+
+/** @param {CreateOptions} createOptions @return {function(QueryRecordOptions): Promise<HistoryResponse | null>} */
+export function createQueryHistoryRecord(createOptions) {
+  return createQueryCruxApi({ ...createOptions, api: 'history' })
+}
 
 /**
  * Fetch CrUX API and handles 4xx errors.
  * Inspired by: https://github.com/GoogleChrome/CrUX/blob/master/js/crux-api-util.js
  *
- * @param {CreateOptions} createOptions
+ * @param {CreateOptions & { api: 'history' | 'record' }} createOptions
  */
 
-export function createQueryRecord(createOptions) {
+function createQueryCruxApi(createOptions) {
   const key = createOptions.key
   const fetch = createOptions.fetch || window.fetch
-  return queryRecord
+  const apiMethod = createOptions.api === 'history' ? 'queryHistoryRecord' : 'queryRecord'
+  return queryCruxApi
 
   /**
    * @param {QueryRecordOptions} queryOptions
-   * @return {Promise<SuccessResponse | null>}
+   * @return {Promise<any | null>}
    */
 
-  async function queryRecord(queryOptions, retryCounter = 1) {
-    const apiEndpoint = `https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=${key}`
+  async function queryCruxApi(queryOptions, retryCounter = 1) {
+    const apiEndpoint = `https://chromeuxreport.googleapis.com/v1/records:${apiMethod}?key=${key}`
     const res = await fetch(apiEndpoint, { method: 'POST', body: JSON.stringify(queryOptions) })
     if (res.status >= 500) throw new Error(`Invalid CrUX API status: ${res.status}`)
 
@@ -61,11 +102,11 @@ export function createQueryRecord(createOptions) {
     if (json && json.error) {
       const { error } = /** @type {ErrorResponse} */ (json)
       if (error.code === 404) return null
-      if (error.code === 429) return retryAfterTimeout(retryCounter, () => queryRecord(queryOptions, retryCounter + 1))
+      if (error.code === 429) return retryAfterTimeout(retryCounter, () => queryCruxApi(queryOptions, retryCounter + 1))
       throw new Error(JSON.stringify(error))
     }
     if (!json || (json && !json.record.key)) throw new Error(`Invalid response: ${JSON.stringify(json)}`)
-    return /** @type {SuccessResponse} */ (json)
+    return json
   }
 }
 
