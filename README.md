@@ -7,7 +7,7 @@ While using the API in [Treo](https://treo.sh/), we discovered a few complex cas
 
 **Features**:
 
-- A tiny (450 bytes) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference);
+- A tiny (500 bytes) wrapper for [Chrome UX Report API](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference);
 - TypeScript notations for [options and responses](https://developers.google.com/web/tools/chrome-user-experience-report/api/reference/rest/v1/records/queryRecord);
 - Isomorphic: works in a browser and node.js;
 - Returns `null` for the `404 (CrUX data not found)` response;

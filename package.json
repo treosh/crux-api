@@ -1,45 +1,35 @@
 {
   "name": "crux-api",
-  "version": "2.0.0",
-  "description": "A Chrome UX Report API wrapper wrapper that handles errors and provides types",
+  "version": "3.0.0",
+  "description": "A tiny CrUX API wrapper that handles errors and provides types",
   "repository": "https://github.com/treosh/crux-api",
   "bugs": "https://github.com/treosh/crux-api/issues",
   "license": "MIT",
+  "type": "module",
   "source": "src/index.js",
-  "module": "src/index.js",
-  "types": "dist/crux-api.d.ts",
-  "main": "dist/crux-api.js",
   "files": [
-    "dist",
     "src"
   ],
   "scripts": {
-    "build": "run-s build:*",
-    "build:src": "microbundle build --no-sourcemap --format=cjs",
-    "build:src-ts": "tsc --declaration --noEmit false --outDir dist/ --allowJs src/index.js && rm dist/index.js && mv dist/index.d.ts dist/crux-api.d.ts",
-    "test": "ava -v && prettier -c src test script README.md && yarn build && tsc -p . && size-limit",
-    "prepack": "yarn build"
+    "test": "ava -v && prettier -c src test script README.md && tsc -p . && size-limit"
   },
   "devDependencies": {
-    "@size-limit/preset-small-lib": "^4.11.0",
-    "@types/node-fetch": "^2.5.10",
-    "ava": "^3.15.0",
-    "esm": "^3.2.25",
-    "microbundle": "^0.13.1",
-    "node-fetch": "^2.6.1",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^2.3.1",
-    "size-limit": "^4.11.0",
-    "typescript": "^4.3.2"
+    "@size-limit/preset-small-lib": "^9.0.0",
+    "@types/node": "^20.8.6",
+    "ava": "^5.3.1",
+    "node-fetch": "^3.3.2",
+    "prettier": "^3.0.3",
+    "size-limit": "^9.0.0",
+    "typescript": "^5.2.2"
   },
   "keywords": [
     "CrUX",
     "CrUX API",
+    "CrUX History API",
     "Chrome User Experience Report",
     "Chrome UX Report",
     "Core Web Vitals",
     "Web Performance",
-    "records.queryRecord",
     "FCP",
     "First Contentful Paint",
     "LCP",
@@ -47,18 +37,19 @@
     "FID",
     "First Input Delay",
     "CLS",
-    "Cumulative Layout Shift"
+    "Cumulative Layout Shift",
+    "INP",
+    "Interation to Next Paint",
+    "TTFB",
+    "Time to First Byte"
   ],
   "size-limit": [
     {
-      "limit": "450B",
+      "limit": "500B",
       "path": "./src/index.js"
     }
   ],
   "ava": {
-    "require": [
-      "esm"
-    ],
     "files": [
       "test/*.js"
     ]

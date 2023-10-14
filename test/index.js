@@ -1,7 +1,8 @@
-// yarn ava test/index.js
+// run: yarn ava test/index.js
+
 import test from 'ava'
 import fetch from 'node-fetch'
-import { createQueryRecord, normalizeUrl } from '../src'
+import { createQueryRecord, normalizeUrl } from '../src/index.js'
 
 const key = process.env.CRUX_KEY || 'no-key'
 
