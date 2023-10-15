@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "noEmit": true,
-    "module": "CommonJS",
-    "target": "ES2020",
+    "moduleResolution": "node",
+    "module": "esnext",
+    "target": "esnext",
     "esModuleInterop": true,
     "allowJs": true,
     "checkJs": true,
