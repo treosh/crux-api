@@ -1,12 +1,12 @@
 {
   "name": "crux-api",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "A tiny CrUX API wrapper that supports record & history API, handles errors, and provides types.",
   "repository": "https://github.com/treosh/crux-api",
   "bugs": "https://github.com/treosh/crux-api/issues",
   "license": "MIT",
   "type": "module",
-  "source": "src/index.js",
+  "exports": "./src/index.js",
   "types": "types/index.d.ts",
   "files": [
     "src",
