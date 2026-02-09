@@ -130,8 +130,7 @@ Returns a `queryRecord` function.
 Fetches CrUX API using [`queryRecord options`](https://developer.chrome.com/docs/crux/api/):
 
 - _queryOptions.url_ or _queryOptions.origin_ (**required**) – the main identifier for a record lookup;
-- _queryOptions.formFactor_ (optional, defaults to all form factors) - the form factor dimension: `PHONE` | `DESKTOP` | `TABLET`;
-- _queryOptions.effectiveConnectionType_ (optional, defaults to all connections) - the effective network class: `4G` | `3G` | `2G` | `slow-2G` | `offline`.
+- _queryOptions.formFactor_ (optional, defaults to all form factors) - the form factor dimension: `PHONE` | `DESKTOP` | `TABLET`.
 
 Returns a Promise with a raw [`queryRecord` response](https://developer.chrome.com/docs/crux/api/#response-body) or `null` when the data is not found.
 
@@ -142,7 +141,6 @@ const queryRecord = createQueryRecord({ key: process.env.CRUX_API_KEY })
 const res = await queryRecord({
   url: 'https://github.com/marketplace?type=actions',
   formFactor: 'DESKTOP',
-  effectiveConnectionType: '4G',
 })
 
 // res -> URL-level data for https://github.com/marketplace
@@ -780,7 +778,6 @@ curl -d url='https://github.com/' \
 
 ```bash
 curl -d url='https://github.com/marketplace?type=actions' \
-     -d effectiveConnectionType=4G \
      -d formFactor=DESKTOP \
      'https://chromeuxreport.googleapis.com/v1/records:queryRecord?key=CRUX_API_KEY'
 ```
@@ -790,7 +787,6 @@ curl -d url='https://github.com/marketplace?type=actions' \
   "record": {
     "key": {
       "formFactor": "DESKTOP",
-      "effectiveConnectionType": "4G",
       "url": "https://github.com/marketplace"
     },
     "metrics": {

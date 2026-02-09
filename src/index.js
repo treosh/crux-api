@@ -3,9 +3,8 @@ const maxRetryTimeout = 60 * 1000 // 60s
 
 /**
  * @typedef {{ key: string, fetch?: function }} CreateOptions
- * @typedef {{ url?: string, origin?: string, formFactor?: FormFactor, effectiveConnectionType?: Connection }} QueryRecordOptions
+ * @typedef {{ url?: string, origin?: string, formFactor?: FormFactor }} QueryRecordOptions
  * @typedef {'ALL_FORM_FACTORS' | 'PHONE' | 'DESKTOP' | 'TABLET'} FormFactor
- * @typedef {'4G' | '3G' | '2G' | 'slow-2G' | 'offline'} Connection
  * @typedef {{ histogram: { start: number | string, end: number | string, density: number }[], percentiles: { p75: number | string } }} MetricValue
  * @typedef {{ year: number, month: number, day: number }} MetricDate
  * @typedef {{ firstDate: MetricDate, lastDate: MetricDate }} CollectionPeriod
@@ -15,7 +14,6 @@ const maxRetryTimeout = 60 * 1000 // 60s
  *      key: {
  *        url?: string,
  *        origin?: string,
- *        effectiveConnectionType?: Connection,
  *        formFactor?: FormFactor
  *      },
  *      metrics: {

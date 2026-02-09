@@ -1,5 +1,5 @@
 // usage:
-// • CRUX_KEY='...' node script/crux-api.js record '{"origin": "https://example.com", "formFactor": "DESKTOP", "effectiveConnectionType": "4G" }' > results/record-example.json
+// • CRUX_KEY='...' node script/crux-api.js record '{"origin": "https://example.com", "formFactor": "DESKTOP" }' > results/record-example.json
 // • CRUX_KEY='...' node script/crux-api.js history '{"url": "https://www.apple.com/", "formFactor": "PHONE" }' > results/history-apple.json
 
 import nodeFetch from 'node-fetch'
