@@ -1,6 +1,6 @@
 // usage:
-// • CRUX_KEY='...' node script/crux-api.js record '{"origin": "https://example.com", "formFactor": "DESKTOP" }' > results/record-example.json
 // • CRUX_KEY='...' node script/crux-api.js history '{"url": "https://www.apple.com/", "formFactor": "PHONE" }' > results/history-apple.json
+// • CRUX_KEY='...' node script/crux-api.js record '{"url": "https://github.com/marketplace?type=actions", "formFactor": "DESKTOP" }' > results/record-github-marketplace.json
 
 import nodeFetch from 'node-fetch'
 import { createQueryRecord, createQueryHistoryRecord } from '../src/index.js'
