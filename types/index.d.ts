@@ -89,8 +89,8 @@ export type QueryRecordOptions = {
     formFactor?: FormFactor;
     effectiveConnectionType?: Connection;
 };
-export type FormFactor = 'ALL_FORM_FACTORS' | 'PHONE' | 'DESKTOP' | 'TABLET';
-export type Connection = '4G' | '3G' | '2G' | 'slow-2G' | 'offline';
+export type FormFactor = "ALL_FORM_FACTORS" | "PHONE" | "DESKTOP" | "TABLET";
+export type Connection = "4G" | "3G" | "2G" | "slow-2G" | "offline";
 export type MetricValue = {
     histogram: {
         start: number | string;
@@ -144,12 +144,12 @@ export type PercentileValues = ((number | string) | null)[];
 export type HistorgramTimeserie = {
     start: number;
     end?: number;
-    densities: (number | 'NaN')[];
+    densities: (number | "NaN")[];
 };
 export type HistoryValue = {
     histogramTimeseries: HistorgramTimeserie[];
     percentilesTimeseries: {
-        p75s: (string | number)[];
+        p75s: PercentileValues;
     };
 };
 export type HistoryResponse = {

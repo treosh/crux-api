@@ -21,13 +21,13 @@
     "test": "yarn types && ava -v test/index.js && prettier -c src test script README.md && tsc -p . && size-limit"
   },
   "devDependencies": {
-    "@size-limit/preset-small-lib": "^9.0.0",
-    "@types/node": "^20.8.6",
-    "ava": "^5.3.1",
+    "@size-limit/preset-small-lib": "^12.0.0",
+    "@types/node": "^25.2.2",
+    "ava": "^6.4.1",
     "node-fetch": "^3.3.2",
-    "prettier": "^3.0.3",
-    "size-limit": "^9.0.0",
-    "typescript": "^5.2.2"
+    "prettier": "^3.8.1",
+    "size-limit": "^12.0.0",
+    "typescript": "^5.9.3"
   },
   "keywords": [
     "CrUX",

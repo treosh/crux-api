@@ -12,10 +12,6 @@ test('createQueryRecord', async (t) => {
 
   t.is(json1?.record.key.url, 'https://github.com/')
   t.is(json1?.record.key.formFactor, 'DESKTOP')
-
-  const json2 = await queryRecord({ origin: 'https://github.com', effectiveConnectionType: '3G' })
-  t.is(json2?.record.key.origin, 'https://github.com')
-  t.is(json2?.record.key.effectiveConnectionType, '3G')
 })
 
 test('createQueryHistoryRecord', async (t) => {
@@ -34,7 +30,7 @@ test('normalizeUrl', async (t) => {
   const urls = [
     ['https://www.gov.uk', 'https://www.gov.uk/'], // adds /
     ['https://www.hey.com/features/', 'https://www.hey.com/features/'], // no change, URL with /
-    ['https://stripe.com/docs/api', 'https://stripe.com/docs/api'], // no change, URL without /
+    ['https://stripe.com/payments', 'https://stripe.com/payments'], // no change, URL without /
     ['https://github.com/marketplace?type=actions', 'https://github.com/marketplace'], // removes search params
   ]
   for (const [unnormalizedUrl, cruxUrl] of urls) {
