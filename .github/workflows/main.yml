@@ -2,14 +2,14 @@ name: CI
 on: push
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: 24
           cache: 'yarn'
-      - run: yarn install
+      - run: yarn install --frozen-lockfile
       - run: yarn test
         env:
           CRUX_KEY: ${{ secrets.CRUX_KEY }}
