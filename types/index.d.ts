@@ -1,6 +1,7 @@
 /**
  * @typedef {{ key: string, fetch?: function }} CreateOptions
- * @typedef {{ url?: string, origin?: string, formFactor?: FormFactor }} QueryRecordOptions
+ * @typedef {{ url?: string, origin?: string, formFactor?: FormFactor, metrics?: string[] }} QueryRecordOptions
+ * @typedef { QueryRecordOptions & { collectionPeriodCount?: number }} QueryHistoryRecordOptions
  * @typedef {'ALL_FORM_FACTORS' | 'PHONE' | 'DESKTOP' | 'TABLET'} FormFactor
  * @typedef {{ percentiles: { p75: number } }} PercentileValue
  * @typedef {{ histogram: { start: number | string, end: number | string, density: number }[], percentiles: { p75: number | string } }} MetricValue
@@ -87,8 +88,8 @@
  */
 /** @param {CreateOptions} createOptions @return {function(QueryRecordOptions): Promise<SuccessResponse | null>} */
 export function createQueryRecord(createOptions: CreateOptions): (arg0: QueryRecordOptions) => Promise<SuccessResponse | null>;
-/** @param {CreateOptions} createOptions @return {function(QueryRecordOptions): Promise<HistoryResponse | null>} */
-export function createQueryHistoryRecord(createOptions: CreateOptions): (arg0: QueryRecordOptions) => Promise<HistoryResponse | null>;
+/** @param {CreateOptions} createOptions @return {function(QueryHistoryRecordOptions): Promise<HistoryResponse | null>} */
+export function createQueryHistoryRecord(createOptions: CreateOptions): (arg0: QueryHistoryRecordOptions) => Promise<HistoryResponse | null>;
 /**
  * Normalize URL to match CrUX API key.
  *
@@ -111,6 +112,10 @@ export type QueryRecordOptions = {
     url?: string;
     origin?: string;
     formFactor?: FormFactor;
+    metrics?: string[];
+};
+export type QueryHistoryRecordOptions = QueryRecordOptions & {
+    collectionPeriodCount?: number;
 };
 export type FormFactor = "ALL_FORM_FACTORS" | "PHONE" | "DESKTOP" | "TABLET";
 export type PercentileValue = {
