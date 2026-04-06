@@ -3,7 +3,8 @@ const maxRetryTimeout = 60 * 1000 // 60s
 
 /**
  * @typedef {{ key: string, fetch?: function }} CreateOptions
- * @typedef {{ url?: string, origin?: string, formFactor?: FormFactor }} QueryRecordOptions
+ * @typedef {{ url?: string, origin?: string, formFactor?: FormFactor, metrics?: string[] }} QueryRecordOptions
+ * @typedef { QueryRecordOptions & { collectionPeriodCount?: number }} QueryHistoryRecordOptions
  * @typedef {'ALL_FORM_FACTORS' | 'PHONE' | 'DESKTOP' | 'TABLET'} FormFactor
  * @typedef {{ percentiles: { p75: number } }} PercentileValue
  * @typedef {{ histogram: { start: number | string, end: number | string, density: number }[], percentiles: { p75: number | string } }} MetricValue
@@ -94,7 +95,7 @@ export function createQueryRecord(createOptions) {
   return createQueryCruxApi({ ...createOptions, api: 'record' })
 }
 
-/** @param {CreateOptions} createOptions @return {function(QueryRecordOptions): Promise<HistoryResponse | null>} */
+/** @param {CreateOptions} createOptions @return {function(QueryHistoryRecordOptions): Promise<HistoryResponse | null>} */
 export function createQueryHistoryRecord(createOptions) {
   return createQueryCruxApi({ ...createOptions, api: 'history' })
 }
@@ -113,7 +114,7 @@ function createQueryCruxApi(createOptions) {
   return queryCruxApi
 
   /**
-   * @param {QueryRecordOptions} queryOptions
+   * @param {QueryRecordOptions | QueryHistoryRecordOptions} queryOptions
    * @return {Promise<any | null>}
    */
 

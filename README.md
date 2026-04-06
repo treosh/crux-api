@@ -196,6 +196,7 @@ Fetches CrUX API using [`queryRecord options`](https://developer.chrome.com/docs
 
 - _queryOptions.url_ or _queryOptions.origin_ (**required**) – the main identifier for a record lookup;
 - _queryOptions.formFactor_ (optional, defaults to all form factors) - the form factor dimension: `PHONE` | `DESKTOP` | `TABLET`.
+- _queryOptions.metrics_ (optional, defaults to all metrics) - an array of metric keys specifying which metrics to return;
 - _queryOptions.collectionPeriodCount_ (optional, default is 25) - the number of collection periods to return between 1 and 40
 
 Returns a Promise with a raw [`queryRecord` response](https://developer.chrome.com/docs/crux/api/#response-body) or `null` when the data is not found.
